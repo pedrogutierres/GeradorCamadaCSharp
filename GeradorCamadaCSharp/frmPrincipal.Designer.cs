@@ -230,7 +230,6 @@
             this.txtPacote.Name = "txtPacote";
             this.txtPacote.Size = new System.Drawing.Size(222, 20);
             this.txtPacote.TabIndex = 11;
-            this.txtPacote.Text = "WebServiceSales";
             // 
             // btnCancelar
             // 
