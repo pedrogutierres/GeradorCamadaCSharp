@@ -56,7 +56,8 @@
     <Compile Include="frmPrincipal.Designer.cs">
       <DependentUpon>frmPrincipal.cs</DependentUpon>
     </Compile>
-    <Compile Include="Funcoes.cs" />
+    <Compile Include="Util\EnumDescription.cs" />
+    <Compile Include="Util\Funcoes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmPrincipal.resx">
@@ -83,6 +84,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Add_New_16.png" />
+    <Content Include="Resources\Cancel_Ret_32.png" />
+    <Content Include="Resources\Command_Refresh_24.png" />
+    <Content Include="Resources\Exit_Ret_32.png" />
+    <Content Include="Resources\Save_Ret_32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

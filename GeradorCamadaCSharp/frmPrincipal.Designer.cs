@@ -77,7 +77,7 @@
             this.btnFechar.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnFechar.FlatAppearance.BorderSize = 0;
             this.btnFechar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnFechar.Image = global::GeradorCamadaAndroid.Properties.Resources.Exit_Ret_32;
+            this.btnFechar.Image = global::GeradorCamadaCSharp.Properties.Resources.Exit_Ret_32;
             this.btnFechar.Location = new System.Drawing.Point(657, 9);
             this.btnFechar.Name = "btnFechar";
             this.btnFechar.Size = new System.Drawing.Size(35, 35);
@@ -230,6 +230,7 @@
             this.txtPacote.Name = "txtPacote";
             this.txtPacote.Size = new System.Drawing.Size(222, 20);
             this.txtPacote.TabIndex = 11;
+            this.txtPacote.Text = "WebServiceSales";
             // 
             // btnCancelar
             // 
@@ -239,7 +240,7 @@
             this.btnCancelar.Enabled = false;
             this.btnCancelar.FlatAppearance.BorderSize = 0;
             this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancelar.Image = global::GeradorCamadaAndroid.Properties.Resources.Cancel_Ret_32;
+            this.btnCancelar.Image = global::GeradorCamadaCSharp.Properties.Resources.Cancel_Ret_32;
             this.btnCancelar.Location = new System.Drawing.Point(297, 247);
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new System.Drawing.Size(35, 35);
@@ -256,7 +257,7 @@
             this.btnConfirmarProcesso.Enabled = false;
             this.btnConfirmarProcesso.FlatAppearance.BorderSize = 0;
             this.btnConfirmarProcesso.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConfirmarProcesso.Image = global::GeradorCamadaAndroid.Properties.Resources.Save_Ret_32;
+            this.btnConfirmarProcesso.Image = global::GeradorCamadaCSharp.Properties.Resources.Save_Ret_32;
             this.btnConfirmarProcesso.Location = new System.Drawing.Point(256, 247);
             this.btnConfirmarProcesso.Name = "btnConfirmarProcesso";
             this.btnConfirmarProcesso.Size = new System.Drawing.Size(35, 35);
@@ -270,7 +271,7 @@
             this.btnAtualizaDatabases.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAtualizaDatabases.FlatAppearance.BorderSize = 0;
             this.btnAtualizaDatabases.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAtualizaDatabases.Image = global::GeradorCamadaAndroid.Properties.Resources.Command_Refresh_24;
+            this.btnAtualizaDatabases.Image = global::GeradorCamadaCSharp.Properties.Resources.Command_Refresh_24;
             this.btnAtualizaDatabases.Location = new System.Drawing.Point(307, 25);
             this.btnAtualizaDatabases.Name = "btnAtualizaDatabases";
             this.btnAtualizaDatabases.Size = new System.Drawing.Size(25, 25);

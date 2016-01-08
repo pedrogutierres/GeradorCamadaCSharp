@@ -21,7 +21,7 @@ using System.ComponentModel;
 using System.Xml.Linq;
 using System.Net.Sockets;
 
-namespace GeradorCamadaCSharp
+namespace GeradorCamadaCSharp.Util
 {
     public class CepInfo
     {
