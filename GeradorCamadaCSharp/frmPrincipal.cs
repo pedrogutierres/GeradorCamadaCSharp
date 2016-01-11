@@ -146,14 +146,6 @@ namespace GeradorCamadaCSharp
                     ArquivoModel = ClasseInfo + ".cs";
                     ArquivoBo = ClasseBo + ".cs";
                     ArquivoDao = ClasseDao + ".cs";
-                    ArquivoHandler = ClasseInfo + "Handler.cs";
-
-                    ProviderCODE = "CODE_" + descricao.ToUpper();
-                    ProviderID = "CODE_" + descricao.ToUpper() + "_ID";
-                    ProviderRAW = "CODE_" + descricao.ToUpper() + "_RAW";
-
-                    CONTENT_URI = "CONTENT_" + descricao.ToUpper() + "_URI";
-                    CONTENT_URI_RAW = "CONTENT_" + descricao.ToUpper() + "_RAW_URI";
                 }
             }
             public string Classe { get; private set; }
@@ -168,12 +160,6 @@ namespace GeradorCamadaCSharp
             public string ArquivoModel { get; private set; }
             public string ArquivoBo { get; private set; }
             public string ArquivoDao { get; private set; }
-            public string ArquivoHandler { get; private set; }
-            public string ProviderCODE { get; private set; }
-            public string ProviderID { get; private set; }
-            public string ProviderRAW { get; private set; }
-            public string CONTENT_URI { get; private set; }
-            public string CONTENT_URI_RAW { get; private set; }
 
             public List<ColunaInfo> colunas = null;
 
@@ -270,10 +256,12 @@ namespace GeradorCamadaCSharp
                 }
             }
             public string Default { get; set; }
+            public string Comentario { get; set; }
             public bool ChavePrimaria { get; set; }
             public bool AceitaNulo { get; set; }
             public bool AutoIncremento { get; set; }
             public bool Index { get; set; }
+
 
             public string DescricaoDB { get; private set; }
             public string DescricaoReferencia { get; private set; }
@@ -445,6 +433,7 @@ namespace GeradorCamadaCSharp
                             coluna.Descricao = rdr["column_name"].ToString();
                             coluna.Tipo = rdr["column_type"].ToString();
                             coluna.Default = rdr["column_default"].ToString();
+                            coluna.Comentario = rdr["column_comment"].ToString();
                             coluna.ChavePrimaria = rdr["column_key"].ToString().ToLower().Contains("pri");
                             coluna.AceitaNulo = rdr["is_nullable"].ToString().ToLower().Contains("yes");
                             coluna.AutoIncremento = rdr["extra"].ToString().ToLower().Contains("auto_increment");
@@ -462,12 +451,17 @@ namespace GeradorCamadaCSharp
                     using (TextWriter arquivo = File.AppendText(diretorio + "\\BaseModel\\" + tabela.ArquivoModel))
                     {
                         bool existeLazyLoading = (tabela.colunas.Find(p => p.Descricao != "id" && p.Descricao.EndsWith("_id")) != null);
+                        bool existeComment = (tabela.colunas.Find(p => !string.IsNullOrEmpty(p.Comentario)) != null);
+
+                        arquivo.WriteLine("using MySql.Data.MySqlClient;");
+                        arquivo.WriteLine("using System;");
+
+                        if (existeComment)
+                            arquivo.WriteLine("using Newtonsoft.Json;");
 
                         arquivo.WriteLine("using " + txtPacote.Text + ".BaseObjects;");
-                        arquivo.WriteLine("using System;");
-                        arquivo.WriteLine("using MySql.Data.MySqlClient;");
-                        arquivo.WriteLine("using WebServiceSales.Util;");
                         arquivo.WriteLine("using WebServiceSales.Library.DAL;");
+                        arquivo.WriteLine("using WebServiceSales.Util;");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("namespace " + txtPacote.Text + ".Library.Model");
                         arquivo.WriteLine("{");
@@ -480,7 +474,13 @@ namespace GeradorCamadaCSharp
                         // Cria variaveis privadas
                         foreach (ColunaInfo c in tabela.colunas)
                         {
-                            arquivo.WriteLine("        public " + EnumDescription.GetDescription(c.TipoVariavel) + " " + c.Descricao + " { get; set; }");
+                            if (!string.IsNullOrEmpty(c.Comentario) && c.Comentario != "notjson")
+                                arquivo.WriteLine("        [JsonProperty(\"" + c.Comentario + "\")]");
+
+                            if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
+                                arquivo.WriteLine("        public " + EnumDescription.GetDescription(c.TipoVariavel) + "? " + c.Descricao + " { get; set; }");
+                            else
+                                arquivo.WriteLine("        public " + EnumDescription.GetDescription(c.TipoVariavel) + " " + c.Descricao + " { get; set; }");
                         }
 
                         // Cria variaveis de classes relacionais
@@ -515,59 +515,13 @@ namespace GeradorCamadaCSharp
                             foreach (ColunaInfo c in tabela.colunas)
                             {
                                 if (!string.IsNullOrEmpty(c.ClasseRelacionalInfo))
-                                    arquivo.WriteLine("        this." + c.ClasseRelacionalApelido + " = t." + c.ClasseRelacionalApelido + ";");
+                                    arquivo.WriteLine("            this." + c.ClasseRelacionalApelido + " = t." + c.ClasseRelacionalApelido + ";");
                             }
                         }
 
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("        public void loadFromDataReader(MySqlDataReader rdr, bool lazyLoading = false)");
-                        arquivo.WriteLine("        {");
 
-                        // Cria load do cursor
-                        foreach (ColunaInfo c in tabela.colunas)
-                        {
-                            if (c.TipoVariavel.Equals(TipoVariavelEnum.Int))
-                                arquivo.WriteLine("            " + c.Descricao + " = mFuncoes.ConvertToInt32(rdr[\"" + c.DescricaoDB + "\"]);");
-                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.Long))
-                                arquivo.WriteLine("            " + c.Descricao + " = mFuncoes.ConvertToInt64(rdr[\"" + c.DescricaoDB + "\"]);");
-                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.Decimal))
-                                arquivo.WriteLine("            " + c.Descricao + " = mFuncoes.ConvertToDecimal(rdr[\"" + c.DescricaoDB + "\"]);");
-                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
-                                arquivo.WriteLine("            " + c.Descricao + " = mFuncoes.ConvertToDateTime(rdr[\"" + c.DescricaoDB + "\"]);");
-                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
-                                arquivo.WriteLine("            " + c.Descricao + " = mFuncoes.ConvertToBoolean(rdr[\"" + c.DescricaoDB + "\"]);");
-                            else
-                                arquivo.WriteLine("            " + c.Descricao + " = mFuncoes.ConvertToString(rdr[\"" + c.DescricaoDB + "\"]);");
-                        }
-
-                        if (existeLazyLoading)
-                        {
-                            arquivo.WriteLine("            if (lazyLoading)");
-                            arquivo.WriteLine("                lazyLoadingMethod();");
-                        }
-
-                        arquivo.WriteLine("        }");
-                        arquivo.WriteLine("");
-
-                        // Cria método lazy loading
-                        if (existeLazyLoading)
-                        {
-                            arquivo.WriteLine("        public void lazyLoadingMethod() {");
-
-                            foreach (ColunaInfo c in tabela.colunas)
-                            {
-                                if (!string.IsNullOrEmpty(c.ClasseRelacionalInfo))
-                                {
-                                    arquivo.WriteLine("            if (" + c.Descricao + " != null)");
-                                    arquivo.WriteLine("                " + c.ClasseRelacionalApelido + " = DAOFactory.get" + c.ClasseRelacionalDao + "().get" + c.ClasseRelacional + "ById(" + c.Descricao + ");");
-                                    arquivo.WriteLine("");
-                                }
-                            }
-
-                            arquivo.WriteLine("        }");
-                            arquivo.WriteLine("");
-                        }
 
                         arquivo.WriteLine("    }");
 
@@ -583,10 +537,17 @@ namespace GeradorCamadaCSharp
                     File.Create(diretorio + "\\Model\\" + tabela.ArquivoModel).Close();
                     using (TextWriter arquivo = File.AppendText(diretorio + "\\Model\\" + tabela.ArquivoModel))
                     {
-                        arquivo.WriteLine("using " + txtPacote.Text + ".BaseObjects;");
-                        arquivo.WriteLine("using System;");
+                        bool existeComment = (tabela.colunas.Find(p => !string.IsNullOrEmpty(p.Comentario)) != null);
+
                         arquivo.WriteLine("using MySql.Data.MySqlClient;");
+                        arquivo.WriteLine("using System;");
+
+                        if (existeComment)
+                            arquivo.WriteLine("using Newtonsoft.Json;");
+
+                        arquivo.WriteLine("using " + txtPacote.Text + ".BaseObjects;");
                         arquivo.WriteLine("using WebServiceSales.Library.DAL;");
+                        arquivo.WriteLine("using WebServiceSales.Util;");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("namespace " + txtPacote.Text + ".Library.Model");
                         arquivo.WriteLine("{");
@@ -935,7 +896,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("        public bool Inserir(" + tabela.ClasseInfo + " _obj, MySqlTransaction _trans)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            long id = 0;");
-                        arquivo.WriteLine("            bool sucesso = mFuncoes.ExecuteNonQuery(_trans, CommandType.Text, cmdInserir, New"+tabela.Classe+"Parameters(_obj, false), out id);");
+                        arquivo.WriteLine("            bool sucesso = mFuncoes.ExecuteNonQuery(_trans, CommandType.Text, cmdInserir, New" + tabela.Classe + "Parameters(_obj, false), out id);");
                         arquivo.WriteLine("            if (sucesso && id > 0)");
                         arquivo.WriteLine("                _obj." + chavePrimaria + " = id;");
                         arquivo.WriteLine("            return sucesso;");
@@ -1123,7 +1084,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("            return parms;");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("        " + tabela.ClasseInfo + " New" + tabela.ClasseInfo + "(MySqlDataReader rdr, bool lazyLoading)");
+                        arquivo.WriteLine("        " + tabela.ClasseInfo + " New" + tabela.ClasseInfo + "(MySqlDataReader rdr, bool lazyLoading = false)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            " + tabela.ClasseInfo + " " + tabela.ApelidoInfo + " = new " + tabela.ClasseInfo + "();");
 
@@ -1137,7 +1098,7 @@ namespace GeradorCamadaCSharp
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Decimal))
                                 arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToDecimal(rdr[\"" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToDateTime(rdr[\"" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.GetDateTimeOrNull(rdr[\"" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
                                 arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToBoolean(rdr[\"" + c.DescricaoDB + "\"]);");
                             else
@@ -1165,7 +1126,7 @@ namespace GeradorCamadaCSharp
                             {
                                 if (!string.IsNullOrEmpty(c.ClasseRelacionalInfo))
                                 {
-                                    arquivo.WriteLine("            if (" + tabela.ApelidoInfo + "." + c.Descricao + " != null)");
+                                    arquivo.WriteLine("            if (" + tabela.ApelidoInfo + "." + c.Descricao + " > 0)");
                                     arquivo.WriteLine("                " + tabela.ApelidoInfo + "." + c.ClasseRelacionalApelido + " = DAOFactory.get" + c.ClasseRelacionalDao + "().get" + c.ClasseRelacional + "ById(" + tabela.ApelidoInfo + "." + c.Descricao + ");");
                                     arquivo.WriteLine("");
                                 }
