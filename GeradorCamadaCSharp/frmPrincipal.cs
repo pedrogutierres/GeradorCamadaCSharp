@@ -1109,7 +1109,7 @@ namespace GeradorCamadaCSharp
                         {
                             arquivo.WriteLine("");
                             arquivo.WriteLine("            if (lazyLoading)");
-                            arquivo.WriteLine("                lazyLoadingMethod(" + tabela.ApelidoInfo + ");");
+                            arquivo.WriteLine("                LazyLoadingMethod(" + tabela.ApelidoInfo + ");");
                         }
                         arquivo.WriteLine("");
                         arquivo.WriteLine("            return " + tabela.ApelidoInfo + ";");
@@ -1119,7 +1119,7 @@ namespace GeradorCamadaCSharp
                         // Cria método lazy loading
                         if (existeLazyLoading)
                         {
-                            arquivo.WriteLine("        void lazyLoadingMethod(" + tabela.ClasseInfo + " " + tabela.ApelidoInfo + ")");
+                            arquivo.WriteLine("        void LazyLoadingMethod(" + tabela.ClasseInfo + " " + tabela.ApelidoInfo + ")");
                             arquivo.WriteLine("        {");
 
                             foreach (ColunaInfo c in tabela.colunas)
