@@ -490,7 +490,12 @@ namespace GeradorCamadaCSharp
                             foreach (ColunaInfo c in tabela.colunas)
                             {
                                 if (!string.IsNullOrEmpty(c.ClasseRelacionalInfo))
+                                {
+                                    if (existeComment)
+                                        arquivo.WriteLine("        [JsonProperty(\"" + c.ClasseRelacionalApelido + "\")]");
+
                                     arquivo.WriteLine("        public " + c.ClasseRelacionalInfo + " " + c.ClasseRelacionalApelido + " { get; set; }");
+                                }
                             }
                         }
 
@@ -564,8 +569,8 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo Base BLL
-                    File.Create(diretorio + "\\BaseBLL\\Base" + tabela.ArquivoBo).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\BaseBLL\\Base" + tabela.ArquivoBo))
+                    File.Create(diretorio + "\\BaseBLL\\" + tabela.ArquivoBo).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\BaseBLL\\" + tabela.ArquivoBo))
                     {
                         arquivo.WriteLine("using " + txtPacote.Text + ".BaseObjects;");
                         arquivo.WriteLine("using " + txtPacote.Text + ".Util;");
@@ -783,6 +788,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("using " + txtPacote.Text + ".Library.DAL;");
                         arquivo.WriteLine("using System;");
                         arquivo.WriteLine("using MySql.Data.MySqlClient;");
+                        arquivo.WriteLine("using System.Collections.Generic;");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("namespace " + txtPacote.Text + ".Library.BLL");
                         arquivo.WriteLine("{");
@@ -1084,7 +1090,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("            return parms;");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("        " + tabela.ClasseInfo + " New" + tabela.ClasseInfo + "(MySqlDataReader rdr, bool lazyLoading = false)");
+                        arquivo.WriteLine("        public static " + tabela.ClasseInfo + " New" + tabela.ClasseInfo + "(MySqlDataReader rdr, bool lazyLoading = false)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            " + tabela.ClasseInfo + " " + tabela.ApelidoInfo + " = new " + tabela.ClasseInfo + "();");
 
