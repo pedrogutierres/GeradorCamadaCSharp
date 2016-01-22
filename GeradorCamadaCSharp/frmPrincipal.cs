@@ -109,6 +109,11 @@ namespace GeradorCamadaCSharp
                         ApelidoPlural = Classe.Substring(0, 1).ToLower() + (Classe.Length > 1 ? Classe.Substring(1) : "");
                         Classe = Classe.Remove(Classe.Length - 1, 1);
                     }
+                    else if (Classe.ToLower().EndsWith("ns"))
+                    {
+                        ApelidoPlural = Classe.Substring(0, 1).ToLower() + (Classe.Length > 1 ? Classe.Substring(1) : "");
+                        Classe = Classe.Remove(Classe.Length - 2, 2) + "m";
+                    }
                     else if (Classe.ToLower().EndsWith("s"))
                     {
                         ApelidoPlural = Classe.Substring(0, 1).ToLower() + (Classe.Length > 1 ? Classe.Substring(1) : "");
@@ -129,6 +134,8 @@ namespace GeradorCamadaCSharp
                             ApelidoPlural = ApelidoInfo.Remove(ApelidoInfo.Length - 2, 2) + "oes";
                         else if (ApelidoInfo.EndsWith("r"))
                             ApelidoPlural = ApelidoInfo + "es";
+                        else if (ApelidoInfo.EndsWith("m"))
+                            ApelidoPlural = ApelidoInfo + "ns";
                         else
                             ApelidoPlural = ApelidoInfo + "s";
                     }
@@ -1282,7 +1289,7 @@ namespace GeradorCamadaCSharp
             coluna = coluna.ToUpper();
             bool ok = true;
 
-            if (coluna.Contains("CODIGO") || coluna.Contains("NUMERO") || coluna.Equals("EAN"))
+            if (coluna.Contains("CODIGO") || coluna.Contains("NUMERO") || coluna.Equals("EAN") || coluna.Equals("CPF") || coluna.Equals("CNPJ"))
             { }
             else if (coluna.Contains("DESCRICAO") || coluna.Contains("NOME") || coluna.Contains("RAZAO") || coluna.Contains("FANTASIA"))
             {
