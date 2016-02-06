@@ -120,11 +120,10 @@ namespace GeradorCamadaCSharp
                         Classe = Classe.Remove(Classe.Length - 1, 1);
                     }
 
-
-
                     ApelidoInfo = Classe.Substring(0, 1).ToLower() + (Classe.Length > 1 ? Classe.Substring(1) : "");
                     ApelidoBo = Classe.Substring(0, 1).ToLower() + (Classe.Length > 1 ? Classe.Substring(1) : "");
                     ApelidoDao = Classe.Substring(0, 1).ToLower() + (Classe.Length > 1 ? Classe.Substring(1) : "");
+                    ClasseWebService = Classe.Substring(0, 1).ToLower() + (Classe.Length > 1 ? Classe.Substring(1) : "");
 
                     if (string.IsNullOrEmpty(ApelidoPlural))
                     {
@@ -143,6 +142,24 @@ namespace GeradorCamadaCSharp
                     ClasseInfo = Classe + "Info";
                     ClasseBo = Classe + "Bo";
                     ClasseDao = Classe + "Dao";
+                    ClasseWebService = Classe;
+
+                    if (ClasseWebService.Contains("_"))
+                    {
+                        bool capsLock = false;
+                        string web = string.Empty;
+                        foreach (char c in ClasseWebService.ToCharArray())
+                        {
+                            if (c != '_')
+                                web += capsLock ? c.ToString().ToUpper() : c.ToString();
+
+                            capsLock = false;
+
+                            if (c == '_')
+                                capsLock = true;
+                        }
+                        ClasseWebService = web;
+                    }
 
                     ApelidoInfo += "Info";
                     ApelidoBo += "Bo";
@@ -153,20 +170,24 @@ namespace GeradorCamadaCSharp
                     ArquivoModel = ClasseInfo + ".cs";
                     ArquivoBo = ClasseBo + ".cs";
                     ArquivoDao = ClasseDao + ".cs";
+                    ArquivoWebService = ClasseWebService + ".asmx.cs";
                 }
             }
             public string Classe { get; private set; }
             public string ClasseInfo { get; private set; }
             public string ClasseBo { get; private set; }
             public string ClasseDao { get; private set; }
+            public string ClasseWebService { get; private set; }
             public string ClassePlural { get; private set; }
             public string ApelidoInfo { get; private set; }
             public string ApelidoBo { get; private set; }
             public string ApelidoDao { get; private set; }
+            public string ApelidoWebService { get; private set; }
             public string ApelidoPlural { get; private set; }
             public string ArquivoModel { get; private set; }
             public string ArquivoBo { get; private set; }
             public string ArquivoDao { get; private set; }
+            public string ArquivoWebService { get; private set; }
 
             public List<ColunaInfo> colunas = null;
 
@@ -190,13 +211,19 @@ namespace GeradorCamadaCSharp
                     {
                         DescricaoDB = descricao.ToLower();
 
+                        descricao = descricao.Replace("-", "_");
+
                         if (descricao.Equals("_id"))
+                        {
+                            descricao = "Id";
+                        }
+                        else if (ChavePrimaria)
                         {
                             descricao = "Id";
                         }
                         else
                         {
-                            if (descricao.EndsWith("_id"))
+                            if (descricao.EndsWith("_id") || (descricao.StartsWith("id") && !ChavePrimaria))
                             {
                                 var t = new TabelaInfo();
                                 t.Descricao = descricao.Remove(descricao.Length - 3, 3);
@@ -222,11 +249,6 @@ namespace GeradorCamadaCSharp
                 }
                 set
                 {
-                    if (Descricao.Contains("sincronizado"))
-                    {
-
-                    }
-
                     tipo = value.ToUpper();
 
                     if (tipo.Contains("VARCHAR") || tipo.Contains("TEXT") || tipo.Contains("CHAR"))
@@ -241,6 +263,10 @@ namespace GeradorCamadaCSharp
                     {
                         TipoVariavel = TipoVariavelEnum.Bool;
                     }
+                    else if (tipo.Contains("BLOB"))
+                    {
+                        TipoVariavel = TipoVariavelEnum.Imagem;
+                    }
                     else if (tipo.Contains("INT"))
                     {
                         if (Descricao.ToUpper().Contains("ID") || Descricao.ToUpper().Contains("CODIGO") || Descricao.ToUpper().Contains("CNPJ") || Descricao.ToUpper().Contains("CPF"))
@@ -248,7 +274,7 @@ namespace GeradorCamadaCSharp
                         else
                             TipoVariavel = TipoVariavelEnum.Int;
                     }
-                    else if (tipo.Contains("DATE"))
+                    else if (tipo.Contains("DATE") || tipo.Contains("TIME"))
                     {
                         TipoVariavel = TipoVariavelEnum.DateTime;
                     }
@@ -297,7 +323,9 @@ namespace GeradorCamadaCSharp
             [Description("decimal")]
             Decimal,
             [Description("bool")]
-            Bool
+            Bool,
+            [Description("Image")]
+            Imagem
         }
 
         public frmPrincipal()
@@ -378,23 +406,36 @@ namespace GeradorCamadaCSharp
                 if (!Directory.Exists(diretorio))
                     Directory.CreateDirectory(diretorio);
 
-                if (!Directory.Exists(diretorio + "\\BaseModel"))
-                    Directory.CreateDirectory(diretorio + "\\BaseModel");
+                if (!Directory.Exists(diretorio + "\\ORM\\BaseModel"))
+                    Directory.CreateDirectory(diretorio + "\\ORM\\BaseModel");
 
-                if (!Directory.Exists(diretorio + "\\Model"))
-                    Directory.CreateDirectory(diretorio + "\\Model");
+                if (!Directory.Exists(diretorio + "\\ORM\\Model"))
+                    Directory.CreateDirectory(diretorio + "\\ORM\\Model");
 
-                if (!Directory.Exists(diretorio + "\\BaseBLL"))
-                    Directory.CreateDirectory(diretorio + "\\BaseBLL");
+                if (!Directory.Exists(diretorio + "\\ORM\\BaseBLL"))
+                    Directory.CreateDirectory(diretorio + "\\ORM\\BaseBLL");
 
-                if (!Directory.Exists(diretorio + "\\BLL"))
-                    Directory.CreateDirectory(diretorio + "\\BLL");
+                if (!Directory.Exists(diretorio + "\\ORM\\BLL"))
+                    Directory.CreateDirectory(diretorio + "\\ORM\\BLL");
 
-                if (!Directory.Exists(diretorio + "\\BaseDAL"))
-                    Directory.CreateDirectory(diretorio + "\\BaseDAL");
+                if (!Directory.Exists(diretorio + "\\ORM\\BaseDAL"))
+                    Directory.CreateDirectory(diretorio + "\\ORM\\BaseDAL");
 
-                if (!Directory.Exists(diretorio + "\\DAL"))
-                    Directory.CreateDirectory(diretorio + "\\DAL");
+                if (!Directory.Exists(diretorio + "\\ORM\\DAL"))
+                    Directory.CreateDirectory(diretorio + "\\ORM\\DAL");
+
+                if (!Directory.Exists(diretorio + "\\WebService"))
+                    Directory.CreateDirectory(diretorio + "\\WebService");
+
+                if (!Directory.Exists(diretorio + "\\Comunicador\\BaseBLL"))
+                    Directory.CreateDirectory(diretorio + "\\Comunicador\\BaseBLL");
+
+                if (!Directory.Exists(diretorio + "\\Comunicador\\BLL"))
+                    Directory.CreateDirectory(diretorio + "\\Comunicador\\BLL");
+
+                string pacoteORM = chkWebService.Checked ? "ORM" : txtPacote.Text;
+                string pacote = txtPacote.Text;
+                string pacoteWebService = chkWebService.Checked && !string.IsNullOrEmpty(txtPacoteWebService.Text) ? txtPacoteWebService.Text : pacote;
 
                 string comando = @"
                     SELECT *, 0 as ordenar
@@ -437,11 +478,11 @@ namespace GeradorCamadaCSharp
                         while (rdr.Read())
                         {
                             coluna = new ColunaInfo();
+                            coluna.ChavePrimaria = rdr["column_key"].ToString().ToLower().Contains("pri");
                             coluna.Descricao = rdr["column_name"].ToString();
                             coluna.Tipo = rdr["column_type"].ToString();
                             coluna.Default = rdr["column_default"].ToString();
                             coluna.Comentario = rdr["column_comment"].ToString();
-                            coluna.ChavePrimaria = rdr["column_key"].ToString().ToLower().Contains("pri");
                             coluna.AceitaNulo = rdr["is_nullable"].ToString().ToLower().Contains("yes");
                             coluna.AutoIncremento = rdr["extra"].ToString().ToLower().Contains("auto_increment");
                             coluna.Index = rdr["column_key"].ToString().ToLower().Contains("mul");
@@ -476,8 +517,8 @@ namespace GeradorCamadaCSharp
                     }
 
                     #region CriaArquivo Base Model
-                    File.Create(diretorio + "\\BaseModel\\" + tabela.ArquivoModel).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\BaseModel\\" + tabela.ArquivoModel))
+                    File.Create(diretorio + "\\ORM\\BaseModel\\" + tabela.ArquivoModel).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BaseModel\\" + tabela.ArquivoModel))
                     {
                         bool existeLazyLoading = (tabela.colunas.Find(p => p.Descricao != "id" && p.Descricao.EndsWith("_id")) != null);
                         bool existeComment = (tabela.colunas.Find(p => !string.IsNullOrEmpty(p.Comentario)) != null);
@@ -488,11 +529,11 @@ namespace GeradorCamadaCSharp
                         if (existeComment)
                             arquivo.WriteLine("using Newtonsoft.Json;");
 
-                        arquivo.WriteLine("using " + txtPacote.Text + ".BaseObjects;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Library.DAL;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Util;");
+                        arquivo.WriteLine("using " + pacoteORM + ".BaseObjects;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Util;");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("namespace " + txtPacote.Text + ".Library.Model");
+                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.Model");
                         arquivo.WriteLine("{");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("    public partial class " + tabela.ClasseInfo + " : BaseInfo");
@@ -506,7 +547,9 @@ namespace GeradorCamadaCSharp
                             if (!string.IsNullOrEmpty(c.Comentario) && c.Comentario != "notjson")
                                 arquivo.WriteLine("        [JsonProperty(\"" + c.Comentario + "\")]");
 
-                            if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
+                            if (c.ChavePrimaria)
+                                arquivo.WriteLine("        public long " + c.Descricao + " { get; set; }");
+                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
                                 arquivo.WriteLine("        public " + EnumDescription.GetDescription(c.TipoVariavel) + "? " + c.Descricao + " { get; set; }");
                             else
                                 arquivo.WriteLine("        public " + EnumDescription.GetDescription(c.TipoVariavel) + " " + c.Descricao + " { get; set; }");
@@ -568,8 +611,8 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo Model
-                    File.Create(diretorio + "\\Model\\" + tabela.ArquivoModel).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\Model\\" + tabela.ArquivoModel))
+                    File.Create(diretorio + "\\ORM\\Model\\" + tabela.ArquivoModel).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\Model\\" + tabela.ArquivoModel))
                     {
                         bool existeComment = (tabela.colunas.Find(p => !string.IsNullOrEmpty(p.Comentario)) != null);
 
@@ -579,11 +622,11 @@ namespace GeradorCamadaCSharp
                         if (existeComment)
                             arquivo.WriteLine("using Newtonsoft.Json;");
 
-                        arquivo.WriteLine("using " + txtPacote.Text + ".BaseObjects;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Library.DAL;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Util;");
+                        arquivo.WriteLine("using " + pacoteORM + ".BaseObjects;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Util;");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("namespace " + txtPacote.Text + ".Library.Model");
+                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.Model");
                         arquivo.WriteLine("{");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("    public partial class " + tabela.ClasseInfo + " : BaseInfo");
@@ -598,18 +641,18 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo Base BLL
-                    File.Create(diretorio + "\\BaseBLL\\" + tabela.ArquivoBo).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\BaseBLL\\" + tabela.ArquivoBo))
+                    File.Create(diretorio + "\\ORM\\BaseBLL\\" + tabela.ArquivoBo).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BaseBLL\\" + tabela.ArquivoBo))
                     {
-                        arquivo.WriteLine("using " + txtPacote.Text + ".BaseObjects;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Util;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Library.Model;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Library.DAL;");
+                        arquivo.WriteLine("using " + pacoteORM + ".BaseObjects;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Util;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
                         arquivo.WriteLine("using System;");
                         arquivo.WriteLine("using MySql.Data.MySqlClient;");
                         arquivo.WriteLine("using System.Collections.Generic;");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("namespace " + txtPacote.Text + ".Library.BLL");
+                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.BLL");
                         arquivo.WriteLine("{");
                         arquivo.WriteLine("    public partial class " + tabela.ClasseBo);
                         arquivo.WriteLine("    {");
@@ -808,18 +851,18 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo BLL
-                    File.Create(diretorio + "\\BLL\\" + tabela.ArquivoBo).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\BLL\\" + tabela.ArquivoBo))
+                    File.Create(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo))
                     {
-                        arquivo.WriteLine("using " + txtPacote.Text + ".BaseObjects;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Util;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Library.Model;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Library.DAL;");
+                        arquivo.WriteLine("using " + pacoteORM + ".BaseObjects;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Util;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
                         arquivo.WriteLine("using System;");
                         arquivo.WriteLine("using MySql.Data.MySqlClient;");
                         arquivo.WriteLine("using System.Collections.Generic;");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("namespace " + txtPacote.Text + ".Library.BLL");
+                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.BLL");
                         arquivo.WriteLine("{");
                         arquivo.WriteLine("    public partial class " + tabela.ClasseBo);
                         arquivo.WriteLine("    {");
@@ -833,8 +876,8 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo Base DAL
-                    File.Create(diretorio + "\\BaseDAL\\" + tabela.ArquivoDao).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\BaseDAL\\" + tabela.ArquivoDao))
+                    File.Create(diretorio + "\\ORM\\BaseDAL\\" + tabela.ArquivoDao).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BaseDAL\\" + tabela.ArquivoDao))
                     {
                         bool existeLazyLoading = (tabela.colunas.Find(p => p.Descricao != "id" && p.Descricao.EndsWith("_id")) != null);
                         string chavePrimaria = tabela.colunas.Find(p => p.ChavePrimaria).Descricao;
@@ -845,10 +888,10 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("using System.Collections.Generic;");
                         arquivo.WriteLine("using System.Data;");
                         arquivo.WriteLine("using System.Linq;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Library.Model;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Util;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Util;");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("namespace " + txtPacote.Text + ".Library.DAL");
+                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.DAL");
                         arquivo.WriteLine("{");
                         arquivo.WriteLine("    public partial class " + tabela.ClasseDao);
                         arquivo.WriteLine("    {");
@@ -871,16 +914,16 @@ namespace GeradorCamadaCSharp
                         {
                             arquivo.WriteLine("        const string param" + c.Descricao + " = \"?" + c.DescricaoDB + "\";");
 
-                            colunas.Append(c.DescricaoDB).Append(",");
-
                             if (!c.ChavePrimaria)
                             {
+                                colunas.Append(c.DescricaoDB).Append(",");
                                 colunasParametros.Append("?").Append(c.DescricaoDB).Append(",");
-                                colunasUpdate.Append(c.DescricaoDB).Append("=?").Append(c.DescricaoDB);
+                                colunasUpdate.Append(c.DescricaoDB).Append("=?").Append(c.DescricaoDB).Append(",");
                             }
                         }
 
-                        colunas.Remove(colunas.Length - 1, 1);
+                        if (colunas.Length > 0)
+                            colunas.Remove(colunas.Length - 1, 1);
                         if (colunasParametros.Length > 0)
                             colunasParametros.Remove(colunasParametros.Length - 1, 1);
                         if (colunasUpdate.Length > 0)
@@ -989,6 +1032,8 @@ namespace GeradorCamadaCSharp
                                     variavelMySqlType = "DateTime";
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
                                     variavelMySqlType = "Bool";
+                                else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
+                                    variavelMySqlType = "Image";
 
                                 string pesquisaPor = "Por" + c.Descricao;
 
@@ -1057,6 +1102,8 @@ namespace GeradorCamadaCSharp
                                     arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", MySqlDbType.DateTime, " + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
                                     arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", MySqlDbType.Bit, " + c.Descricao + ");");
+                                else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
+                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", MySqlDbType.LongBlob, mFuncoes.ConvertImageToByteArray(" + c.Descricao + "));");
                                 else
                                     arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", MySqlDbType.String, " + c.Descricao + ");");
 
@@ -1107,6 +1154,8 @@ namespace GeradorCamadaCSharp
                                     arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", MySqlDbType.DateTime, _obj." + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
                                     arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", MySqlDbType.Bit, _obj." + c.Descricao + ");");
+                                else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
+                                    arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", MySqlDbType.LongBlob, mFuncoes.ConvertImageToByteArray(_obj." + c.Descricao + "));");
                                 else
                                     arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", MySqlDbType.String, _obj." + c.Descricao + ");");
 
@@ -1128,7 +1177,9 @@ namespace GeradorCamadaCSharp
                         // Cria new info do data reader
                         foreach (ColunaInfo c in tabela.colunas)
                         {
-                            if (c.TipoVariavel.Equals(TipoVariavelEnum.Int))
+                            if (c.ChavePrimaria)
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt64(rdr[\"" + c.DescricaoDB + "\"]);");
+                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.Int))
                                 arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt32(rdr[\"" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Long))
                                 arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt64(rdr[\"" + c.DescricaoDB + "\"]);");
@@ -1138,6 +1189,8 @@ namespace GeradorCamadaCSharp
                                 arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.GetDateTimeOrNull(rdr[\"" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
                                 arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToBoolean(rdr[\"" + c.DescricaoDB + "\"]);");
+                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToImage(rdr, \"" + c.DescricaoDB + "\");");
                             else
                                 arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToString(rdr[\"" + c.DescricaoDB + "\"]);");
                         }
@@ -1181,18 +1234,18 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo DAL
-                    File.Create(diretorio + "\\DAL\\" + tabela.ArquivoDao).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\DAL\\" + tabela.ArquivoDao))
+                    File.Create(diretorio + "\\ORM\\DAL\\" + tabela.ArquivoDao).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\DAL\\" + tabela.ArquivoDao))
                     {
                         arquivo.WriteLine("using MySql.Data.MySqlClient;");
                         arquivo.WriteLine("using System;");
                         arquivo.WriteLine("using System.Collections.Generic;");
                         arquivo.WriteLine("using System.Data;");
                         arquivo.WriteLine("using System.Linq;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Library.Model;");
-                        arquivo.WriteLine("using " + txtPacote.Text + ".Util;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Util;");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("namespace " + txtPacote.Text + ".Library.DAL");
+                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.DAL");
                         arquivo.WriteLine("{");
                         arquivo.WriteLine("    public partial class " + tabela.ClasseDao);
                         arquivo.WriteLine("    {");
@@ -1204,15 +1257,1205 @@ namespace GeradorCamadaCSharp
                         arquivo.Close();
                     }
                     #endregion
+
+                    #region CriaArquivo WebService Base
+                    if (chkWebService.Checked)
+                    {
+                        File.Create(diretorio + "\\WebService\\Base" + tabela.ArquivoWebService.Replace(".cs", "")).Close();
+                        using (TextWriter arquivo = File.AppendText(diretorio + "\\WebService\\Base" + tabela.ArquivoWebService.Replace(".cs", "")))
+                        {
+                            arquivo.WriteLine("<%@ WebService Language=\"C#\" CodeBehind=\"Base" + tabela.ArquivoWebService + "\" Class=\"" + pacoteWebService + "." + tabela.ClasseWebService + "\" %>");
+                            arquivo.Flush();
+                            arquivo.Close();
+                        }
+
+                        File.Create(diretorio + "\\WebService\\Base" + tabela.ArquivoWebService).Close();
+                        using (TextWriter arquivo = File.AppendText(diretorio + "\\WebService\\Base" + tabela.ArquivoWebService))
+                        {
+                            string chavePrimaria = tabela.colunas.Find(p => p.ChavePrimaria).Descricao;
+                            string chavePrimariaDB = tabela.colunas.Find(p => p.ChavePrimaria).DescricaoDB;
+
+                            arquivo.WriteLine("using Newtonsoft.Json;");
+                            arquivo.WriteLine("using System;");
+                            arquivo.WriteLine("using System.Collections.Generic;");
+                            arquivo.WriteLine("using System.Configuration;");
+                            arquivo.WriteLine("using System.Data;");
+                            arquivo.WriteLine("using System.IO;");
+                            arquivo.WriteLine("using System.Text;");
+                            arquivo.WriteLine("using System.Web.Configuration;");
+                            arquivo.WriteLine("using System.Web.Script.Services;");
+                            arquivo.WriteLine("using System.Web.Services;");
+                            arquivo.WriteLine("using " + pacoteWebService + ".Util;");
+                            arquivo.WriteLine("using " + pacoteORM + ".Library.BLL;");
+                            arquivo.WriteLine("using System.Web;");
+                            arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
+                            arquivo.WriteLine("using " + pacoteWebService + ".Library.Model;");
+                            arquivo.WriteLine("using MySql.Data.MySqlClient;");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("namespace " + pacoteWebService);
+                            arquivo.WriteLine("{");
+                            arquivo.WriteLine("    /// <summary>");
+                            arquivo.WriteLine("    /// Summary description for " + tabela.ClasseWebService);
+                            arquivo.WriteLine("    /// </summary>");
+                            arquivo.WriteLine("    [WebService(Namespace = \"http://tempuri.org/\")]");
+                            arquivo.WriteLine("    [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]");
+                            arquivo.WriteLine("    [System.ComponentModel.ToolboxItem(false)]");
+                            arquivo.WriteLine("    // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. ");
+                            arquivo.WriteLine("    // [System.Web.Script.Services.ScriptService]");
+                            arquivo.WriteLine("    public partial class " + tabela.ClasseWebService + " : System.Web.Services.WebService");
+                            arquivo.WriteLine("    {");
+                            arquivo.WriteLine("        class Accessor");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            static Funcoes funcoes;");
+                            arquivo.WriteLine("            internal static Funcoes Funcoes");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                get");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    try");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        if (funcoes == null)");
+                            arquivo.WriteLine("                            funcoes = Funcoes.newInstance();");
+                            arquivo.WriteLine("                        return funcoes;");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                    catch (Exception err)");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        throw new Exception(err.Message);");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("            static " + pacoteORM + ".Util.Funcoes funcoesDB;");
+                            arquivo.WriteLine("            internal static " + pacoteORM + ".Util.Funcoes FuncoesDB");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                get");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    try");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        if (funcoesDB == null)");
+                            arquivo.WriteLine("                            funcoesDB = ORM.Util.Funcoes.newInstance();");
+                            arquivo.WriteLine("                        return funcoesDB;");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                    catch (Exception err)");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        throw new Exception(err.Message);");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("            static " + tabela.ClasseBo + " " + tabela.ApelidoBo + ";");
+                            arquivo.WriteLine("            internal static " + tabela.ClasseBo + " " + tabela.ClasseBo);
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                get");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    try");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        if (" + tabela.ApelidoBo + " == null)");
+                            arquivo.WriteLine("                            " + tabela.ApelidoBo + " = " + tabela.ClasseBo + ".newInstance();");
+                            arquivo.WriteLine("                        return " + tabela.ApelidoBo + ";");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                    catch (Exception err)");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        throw new Exception(err.Message);");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("        private void AjustaPaginaApenasJson(string json)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            HttpContext.Current.Response.ContentType = \"application/json\";");
+                            arquivo.WriteLine("            HttpContext.Current.Response.Write(json);");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+
+                            if (rdbSOAP.Checked)
+                            {
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        public bool Salvar(" + tabela.ClasseInfo + " _obj)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                return SalvarInfo(_obj);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                throw;");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public string SalvarJson(string json)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            bool sucesso = false;");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                ResultWeb<" + tabela.ClasseInfo + "> info = JsonConvert.DeserializeObject<ResultWeb<" + tabela.ClasseInfo + ">>(json);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                sucesso = SalvarInfo(info.ResultInfo);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            { }");
+                                arquivo.WriteLine("            return JsonConvert.SerializeObject(sucesso);");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public string SalvarJsonResult(string json)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            ResultWeb<" + tabela.ClasseInfo + "> info = new ResultWeb<" + tabela.ClasseInfo + ">();");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.ResultInfo = JsonConvert.DeserializeObject<" + tabela.ClasseInfo + ">(json);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                if (!SalvarInfo(info.ResultInfo))");
+                                arquivo.WriteLine("                    throw new Exception(\"Não foi possível salvar o registro.\");");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch (Exception ex)");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.setErrorMessage(ex.Message);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            return JsonConvert.SerializeObject(info);");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+                            else
+                            {
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public void SalvarJson(string json)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            bool sucesso = false;");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                ResultWeb<" + tabela.ClasseInfo + "> info = JsonConvert.DeserializeObject<ResultWeb<" + tabela.ClasseInfo + ">>(json);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                sucesso = SalvarInfo(info.ResultInfo);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            { }");
+                                arquivo.WriteLine("            AjustaPaginaApenasJson(sucesso.ToString());");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public void SalvarJsonResult(string json)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            ResultWeb<" + tabela.ClasseInfo + "> info = new ResultWeb<" + tabela.ClasseInfo + ">();");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.ResultInfo = JsonConvert.DeserializeObject<" + tabela.ClasseInfo + ">(json);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                if (!SalvarInfo(info.ResultInfo))");
+                                arquivo.WriteLine("                    throw new Exception(\"Não foi possível salvar o registro.\");");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch (Exception ex)");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.setErrorMessage(ex.Message);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            AjustaPaginaApenasJson(info.ToJson());");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+
+                            arquivo.WriteLine("        private bool SalvarInfo(" + tabela.ClasseInfo + " _obj)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            try");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                if (Accessor." + tabela.ClasseBo + ".Salvar(_obj))");
+                            arquivo.WriteLine("                    return true;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            catch");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                throw;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            return false;");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+                            if (rdbSOAP.Checked)
+                            {
+                                arquivo.WriteLine("		   [WebMethod]");
+                                arquivo.WriteLine("        public bool SalvarList(List<" + tabela.ClasseInfo + "> _obj)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                return SalvarListInfo(_obj);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                throw;");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public string SalvarJsonList(string json)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            bool sucesso = false;");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                List<" + tabela.ClasseInfo + "> infos = JsonConvert.DeserializeObject<List<" + tabela.ClasseInfo + ">>(json);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                sucesso = SalvarList(infos);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            { }");
+                                arquivo.WriteLine("            return JsonConvert.SerializeObject(sucesso);");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public string SalvarJsonListResult(string json)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            ResultWeb<List<" + tabela.ClasseInfo + ">> info = new ResultWeb<List<" + tabela.ClasseInfo + ">>();");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.ResultInfo = JsonConvert.DeserializeObject<List<" + tabela.ClasseInfo + ">>(json);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                if (!SalvarList(info.ResultInfo))");
+                                arquivo.WriteLine("                    throw new Exception(\"Não foi possível salvar os registros.\");");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch (Exception ex)");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.setErrorMessage(ex.Message);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            return JsonConvert.SerializeObject(info);");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+                            else
+                            {
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public void SalvarJsonList(string json)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            bool sucesso = false;");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                List<" + tabela.ClasseInfo + "> infos = JsonConvert.DeserializeObject<List<" + tabela.ClasseInfo + ">>(json);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                sucesso = SalvarList(infos);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            { }");
+                                arquivo.WriteLine("            AjustaPaginaApenasJson(sucesso.ToString());");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public void SalvarJsonListResult(string json)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            ResultWeb<List<" + tabela.ClasseInfo + ">> info = new ResultWeb<List<" + tabela.ClasseInfo + ">>();");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.ResultInfo = JsonConvert.DeserializeObject<List<" + tabela.ClasseInfo + ">>(json);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                if (!SalvarList(info.ResultInfo))");
+                                arquivo.WriteLine("                    throw new Exception(\"Não foi possível salvar os registros.\");");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch (Exception ex)");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.setErrorMessage(ex.Message);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            AjustaPaginaApenasJson(info.ToJson());");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+
+                            arquivo.WriteLine("        private bool SalvarListInfo(List<" + tabela.ClasseInfo + "> infos)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            bool sucesso = false;");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("            MySqlTransaction trans = null;");
+                            arquivo.WriteLine("            try");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                trans = Accessor.FuncoesDB.BeginTransaction();");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("                foreach (" + tabela.ClasseInfo + " t in infos)");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    sucesso = Accessor." + tabela.ClasseBo + ".Salvar(t, trans);");
+                            arquivo.WriteLine("                    if (!sucesso)");
+                            arquivo.WriteLine("                        break;");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("                if (sucesso)");
+                            arquivo.WriteLine("                    Accessor.FuncoesDB.CommitTransaction(trans);");
+                            arquivo.WriteLine("                else");
+                            arquivo.WriteLine("                    Accessor.FuncoesDB.RollbackTransaction(trans);");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            catch (MySqlException ex)");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                try");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    if (trans != null)");
+                            arquivo.WriteLine("                        Accessor.FuncoesDB.RollbackTransaction(trans);");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("                catch { }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("                throw;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            catch (Exception ex)");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                try");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    if (trans != null)");
+                            arquivo.WriteLine("                        Accessor.FuncoesDB.RollbackTransaction(trans);");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("                catch { }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("                throw;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            return sucesso;");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+
+                            if (rdbSOAP.Checked)
+                            {
+                                arquivo.WriteLine("		   [WebMethod]");
+                                arquivo.WriteLine("        public bool Excluir(" + tabela.ClasseInfo + " _obj)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                return ExcluirInfo(_obj." + chavePrimaria + ");");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                throw;");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public bool ExcluirPorId(long Id)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            bool sucesso = false;");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                sucesso = ExcluirInfo(Id);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            { }");
+                                arquivo.WriteLine("            return sucesso;");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public string ExcluirJson(string json)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            bool sucesso = false;");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                ResultWeb<" + tabela.ClasseInfo + "> info = JsonConvert.DeserializeObject<ResultWeb<" + tabela.ClasseInfo + ">>(json);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                sucesso = ExcluirInfo(info.ResultInfo." + chavePrimaria + ");");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            { }");
+                                arquivo.WriteLine("            return JsonConvert.SerializeObject(sucesso);");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+                            else
+                            {
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public void Excluir(long Id)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            bool sucesso = false;");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                sucesso = ExcluirInfo(Id);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            { }");
+                                arquivo.WriteLine("            AjustaPaginaApenasJson(sucesso.ToString());");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public void ExcluirJson(string json)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            bool sucesso = false;");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                ResultWeb<" + tabela.ClasseInfo + "> info = JsonConvert.DeserializeObject<ResultWeb<" + tabela.ClasseInfo + ">>(json);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                sucesso = ExcluirInfo(info.ResultInfo." + chavePrimaria + ");");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            { }");
+                                arquivo.WriteLine("            AjustaPaginaApenasJson(sucesso.ToString());");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+
+                            arquivo.WriteLine("        private bool ExcluirInfo(long Id)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            try");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                if (Accessor." + tabela.ClasseBo + ".Excluir(Id))");
+                            arquivo.WriteLine("                    return true;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            catch");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                throw;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            return false;");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+
+                            if (rdbSOAP.Checked)
+                            {
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        public " + tabela.ClasseInfo + " RetornaPorId(long Id)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                return Accessor." + tabela.ClasseBo + ".RetornaPorId(Id);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                throw;");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public string RetornaPorIdJson(long Id)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            " + tabela.ClasseInfo + " info = null;");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info = Accessor." + tabela.ClasseBo + ".RetornaPorId(Id);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                throw;");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            return JsonConvert.SerializeObject(info);");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+                            else
+                            {
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public void RetornaPorIdJson(long Id)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            ResultWeb<" + tabela.ClasseInfo + "> info = new ResultWeb<" + tabela.ClasseInfo + ">();");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.ResultInfo = Accessor." + tabela.ClasseBo + ".RetornaPorId(Id);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch (Exception ex)");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.setErrorMessage(ex.Message);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            AjustaPaginaApenasJson(info.ToJson());");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+
+                            List<ColunaInfo> joins = new List<ColunaInfo>();
+                            foreach (ColunaInfo c in tabela.colunas)
+                            {
+                                bool lista = false;
+                                bool join = false;
+
+                                if (CriarSelect(c.Descricao, ref lista, ref join))
+                                {
+                                    if (join)
+                                        joins.Add(c);
+
+                                    string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+
+                                    if (variavel.Equals("integer"))
+                                        variavel = "int";
+
+                                    string pesquisaPor = "Por" + c.Descricao;
+
+                                    if (!lista)
+                                    {
+                                        if (rdbSOAP.Checked)
+                                        {
+                                            arquivo.WriteLine("        [WebMethod]");
+                                            arquivo.WriteLine("        public " + tabela.ClasseInfo + " Retorna" + pesquisaPor + "(" + variavel + " " + c.Descricao + ")");
+                                            arquivo.WriteLine("        {");
+                                            arquivo.WriteLine("            try");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                return Accessor." + tabela.ClasseBo + ".Retorna" + pesquisaPor + "(" + c.Descricao + ");");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("            catch");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                throw;");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("        }");
+                                            arquivo.WriteLine("");
+                                            arquivo.WriteLine("        [WebMethod]");
+                                            arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                            arquivo.WriteLine("        public string Retorna" + pesquisaPor + "Json(" + variavel + " " + c.Descricao + ")");
+                                            arquivo.WriteLine("        {");
+                                            arquivo.WriteLine("            " + tabela.ClasseInfo + " info = null;");
+                                            arquivo.WriteLine("            try");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                info = Accessor." + tabela.ClasseBo + ".Retorna" + pesquisaPor + "(" + c.Descricao + ");");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("            catch");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                throw;");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("            return JsonConvert.SerializeObject(info);");
+                                            arquivo.WriteLine("        }");
+                                            arquivo.WriteLine("");
+                                        }
+                                        else
+                                        {
+                                            arquivo.WriteLine("        [WebMethod]");
+                                            arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                            arquivo.WriteLine("        public void Retorna" + pesquisaPor + "Json(" + variavel + " " + c.Descricao + ")");
+                                            arquivo.WriteLine("        {");
+                                            arquivo.WriteLine("            ResultWeb<" + tabela.ClasseInfo + "> info = new ResultWeb<" + tabela.ClasseInfo + ">();");
+                                            arquivo.WriteLine("            try");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                info.ResultInfo = Accessor." + tabela.ClasseBo + ".Retorna" + pesquisaPor + "(" + c.Descricao + ");");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("            catch (Exception ex)");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                info.setErrorMessage(ex.Message);");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("            AjustaPaginaApenasJson(info.ToJson());");
+                                            arquivo.WriteLine("        }");
+                                            arquivo.WriteLine("");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (rdbSOAP.Checked)
+                                        {
+                                            arquivo.WriteLine("        [WebMethod]");
+                                            arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + variavel + " " + c.Descricao + ")");
+                                            arquivo.WriteLine("        {");
+                                            arquivo.WriteLine("            try");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                return Accessor." + tabela.ClasseBo + ".Retorna" + pesquisaPor + "(" + c.Descricao + ");");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("            catch");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                throw;");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("        }");
+                                            arquivo.WriteLine("");
+                                            arquivo.WriteLine("        [WebMethod]");
+                                            arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                            arquivo.WriteLine("        public string Retorna" + pesquisaPor + "Json(" + variavel + " " + c.Descricao + ")");
+                                            arquivo.WriteLine("        {");
+                                            arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> info = null;");
+                                            arquivo.WriteLine("            try");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                info = Accessor." + tabela.ClasseBo + ".Retorna" + pesquisaPor + "(" + c.Descricao + ");");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("            catch");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                throw;");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("            return JsonConvert.SerializeObject(info);");
+                                            arquivo.WriteLine("        }");
+                                            arquivo.WriteLine("");
+                                        }
+                                        else
+                                        {
+                                            arquivo.WriteLine("        [WebMethod]");
+                                            arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                            arquivo.WriteLine("        public void Retorna" + pesquisaPor + "Json(" + variavel + " " + c.Descricao + ")");
+                                            arquivo.WriteLine("        {");
+                                            arquivo.WriteLine("            ResultWeb<List<" + tabela.ClasseInfo + ">> info = new ResultWeb<List<" + tabela.ClasseInfo + ">>();");
+                                            arquivo.WriteLine("            try");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                info.ResultInfo = Accessor." + tabela.ClasseBo + ".Retorna" + pesquisaPor + "(" + c.Descricao + ");");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("            catch (Exception ex)");
+                                            arquivo.WriteLine("            {");
+                                            arquivo.WriteLine("                info.setErrorMessage(ex.Message);");
+                                            arquivo.WriteLine("            }");
+                                            arquivo.WriteLine("            AjustaPaginaApenasJson(info.ToJson());");
+                                            arquivo.WriteLine("        }");
+                                            arquivo.WriteLine("");
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (joins.Count > 1)
+                            {
+                                StringBuilder parametros = new StringBuilder();
+                                StringBuilder parametrosPassar = new StringBuilder();
+
+                                foreach (ColunaInfo c in joins)
+                                {
+                                    string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+
+                                    parametros.Append(variavel + " " + c.Descricao + ", ");
+
+                                    parametrosPassar.Append(c.Descricao + ", ");
+                                }
+
+                                if (rdbSOAP.Checked)
+                                {
+                                    arquivo.WriteLine("        [WebMethod]");
+                                    arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaPorParametros(" + parametros.ToString().Remove(parametros.Length - 2, 2) + ")");
+                                    arquivo.WriteLine("        {");
+                                    arquivo.WriteLine("            try");
+                                    arquivo.WriteLine("            {");
+                                    arquivo.WriteLine("                return " + tabela.ApelidoDao + ".RetornaPorParametros(" + parametrosPassar.ToString().Remove(parametrosPassar.Length - 2, 2) + ");");
+                                    arquivo.WriteLine("            }");
+                                    arquivo.WriteLine("            catch");
+                                    arquivo.WriteLine("            {");
+                                    arquivo.WriteLine("                throw;");
+                                    arquivo.WriteLine("            }");
+                                    arquivo.WriteLine("        }");
+                                    arquivo.WriteLine("");
+                                    arquivo.WriteLine("        [WebMethod]");
+                                    arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                    arquivo.WriteLine("        public string RetornaPorParametrosJson(" + parametros.ToString().Remove(parametros.Length - 2, 2) + ")");
+                                    arquivo.WriteLine("        {");
+                                    arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> info = null;");
+                                    arquivo.WriteLine("            try");
+                                    arquivo.WriteLine("            {");
+                                    arquivo.WriteLine("                info = Accessor." + tabela.ClasseBo + ".RetornaPorParametros(" + parametrosPassar.ToString().Remove(parametrosPassar.Length - 2, 2) + ");");
+                                    arquivo.WriteLine("            }");
+                                    arquivo.WriteLine("            catch");
+                                    arquivo.WriteLine("            {");
+                                    arquivo.WriteLine("                throw;");
+                                    arquivo.WriteLine("            }");
+                                    arquivo.WriteLine("            return JsonConvert.SerializeObject(info);");
+                                    arquivo.WriteLine("        }");
+                                    arquivo.WriteLine("");
+                                }
+                                else
+                                {
+                                    arquivo.WriteLine("        [WebMethod]");
+                                    arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                    arquivo.WriteLine("        public void RetornaPorParametrosJson(" + parametros.ToString().Remove(parametros.Length - 2, 2) + ")");
+                                    arquivo.WriteLine("        {");
+                                    arquivo.WriteLine("            ResultWeb<List<" + tabela.ClasseInfo + ">> info = new ResultWeb<List<" + tabela.ClasseInfo + ">>();");
+                                    arquivo.WriteLine("            try");
+                                    arquivo.WriteLine("            {");
+                                    arquivo.WriteLine("                info.ResultInfo = Accessor." + tabela.ClasseBo + ".RetornaPorParametros(" + parametrosPassar.ToString().Remove(parametrosPassar.Length - 2, 2) + ");");
+                                    arquivo.WriteLine("            }");
+                                    arquivo.WriteLine("            catch (Exception ex)");
+                                    arquivo.WriteLine("            {");
+                                    arquivo.WriteLine("                info.setErrorMessage(ex.Message);");
+                                    arquivo.WriteLine("            }");
+                                    arquivo.WriteLine("            AjustaPaginaApenasJson(info.ToJson());");
+                                    arquivo.WriteLine("        }");
+                                    arquivo.WriteLine("");
+                                }
+                            }
+
+                            if (rdbSOAP.Checked)
+                            {
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaTodos()");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                return Accessor." + tabela.ClasseBo + ".RetornaTodos();");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                throw;");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public string RetornaTodosJson()");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> info = null;");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info = Accessor." + tabela.ClasseBo + ".RetornaTodos();");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                throw;");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            return JsonConvert.SerializeObject(info);");
+                                arquivo.WriteLine("        }");
+                            }
+                            else
+                            {
+                                arquivo.WriteLine("        [WebMethod]");
+                                arquivo.WriteLine("        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]");
+                                arquivo.WriteLine("        public void RetornaTodosJson()");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            ResultWeb<List<" + tabela.ClasseInfo + ">> info = new ResultWeb<List<" + tabela.ClasseInfo + ">>();");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.ResultInfo = Accessor." + tabela.ClasseBo + ".RetornaTodos();");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch (Exception ex)");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                info.setErrorMessage(ex.Message);");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            AjustaPaginaApenasJson(info.ToJson());");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+
+                            arquivo.WriteLine("    }");
+                            arquivo.WriteLine("}");
+
+                            arquivo.Flush();
+                            arquivo.Close();
+                        }
+                    }
+                    #endregion
+
+                    #region CriarArquivo WebService
+                    if (chkWebService.Checked)
+                    {
+                        File.Create(diretorio + "\\WebService\\" + tabela.ArquivoWebService.Replace(".cs", "")).Close();
+                        using (TextWriter arquivo = File.AppendText(diretorio + "\\WebService\\" + tabela.ArquivoWebService.Replace(".cs", "")))
+                        {
+                            arquivo.WriteLine("<%@ WebService Language=\"C#\" CodeBehind=\"" + tabela.ArquivoWebService + "\" Class=\"" + pacoteWebService + "." + tabela.ClasseWebService + "\" %>");
+                            arquivo.Flush();
+                            arquivo.Close();
+                        }
+
+                        File.Create(diretorio + "\\WebService\\" + tabela.ArquivoWebService).Close();
+                        using (TextWriter arquivo = File.AppendText(diretorio + "\\WebService\\" + tabela.ArquivoWebService))
+                        {
+                            arquivo.WriteLine("using Newtonsoft.Json;");
+                            arquivo.WriteLine("using System;");
+                            arquivo.WriteLine("using System.Collections.Generic;");
+                            arquivo.WriteLine("using System.Configuration;");
+                            arquivo.WriteLine("using System.Data;");
+                            arquivo.WriteLine("using System.IO;");
+                            arquivo.WriteLine("using System.Text;");
+                            arquivo.WriteLine("using System.Web.Configuration;");
+                            arquivo.WriteLine("using System.Web.Script.Services;");
+                            arquivo.WriteLine("using System.Web.Services;");
+                            arquivo.WriteLine("using " + pacoteWebService + ".Util;");
+                            arquivo.WriteLine("using " + pacoteORM + ".Library.BLL;");
+                            arquivo.WriteLine("using System.Web;");
+                            arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
+                            arquivo.WriteLine("using " + pacoteWebService + ".Library.Model;");
+                            arquivo.WriteLine("using MySql.Data.MySqlClient;");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("namespace " + pacoteWebService);
+                            arquivo.WriteLine("{");
+                            arquivo.WriteLine("    public partial class " + tabela.ClasseWebService + " : System.Web.Services.WebService");
+                            arquivo.WriteLine("    {");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("    }");
+                            arquivo.WriteLine("}");
+
+                            arquivo.Flush();
+                            arquivo.Close();
+                        }
+                    }
+                    #endregion
+
+                    #region CriaArquivo COMUNICADOR Base BLL
+                    if (chkWebService.Checked && !string.IsNullOrEmpty(txtPacoteWebService.Text))
+                    {
+                        bool newInstance = !chkComunicadorSemNewInstance.Checked;
+
+                        File.Create(diretorio + "\\Comunicador\\BaseBLL\\" + tabela.ArquivoBo).Close();
+                        using (TextWriter arquivo = File.AppendText(diretorio + "\\Comunicador\\BaseBLL\\" + tabela.ArquivoBo))
+                        {
+                            if (newInstance)
+                                arquivo.WriteLine("using " + pacote + ".Util;");
+                            arquivo.WriteLine("using " + pacoteORM + ".BaseObjects;");
+                            arquivo.WriteLine("using " + pacoteORM + ".Util;");
+                            arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
+                            arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
+                            arquivo.WriteLine("using System;");
+                            arquivo.WriteLine("using MySql.Data.MySqlClient;");
+                            arquivo.WriteLine("using System.Collections.Generic;");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("namespace " + pacote + ".Library.BLL");
+                            arquivo.WriteLine("{");
+                            arquivo.WriteLine("    public partial class " + tabela.ClasseBo);
+                            arquivo.WriteLine("    {");
+                            arquivo.WriteLine("        class Accessor");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            static Funcoes funcoes;");
+                            arquivo.WriteLine("            internal static Funcoes Funcoes");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                get");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    try");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        if (funcoes == null)");
+                            arquivo.WriteLine("                            funcoes = " + (newInstance ? " Funcoes.newInstance();" : "new Funcoes();"));
+                            arquivo.WriteLine("                        return funcoes;");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                    catch (Exception err)");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        throw new Exception(err.Message);");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("            static " + pacoteORM + ".Util.Funcoes funcoesDB;");
+                            arquivo.WriteLine("            internal static " + pacoteORM + ".Util.Funcoes FuncoesDB");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                get");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    try");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        if (funcoesDB == null)");
+                            arquivo.WriteLine("                            funcoesDB = ORM.Util.Funcoes.newInstance();");
+                            arquivo.WriteLine("                        return funcoesDB;");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                    catch (Exception err)");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        throw new Exception(err.Message);");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("            static " + pacoteORM + ".Library.BLL." + tabela.ClasseBo + " " + tabela.ApelidoBo + ";");
+                            arquivo.WriteLine("            internal static " + pacoteORM + ".Library.BLL." + tabela.ClasseBo + " " + tabela.ClasseBo);
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                get");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    try");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        if (" + tabela.ApelidoBo + " == null)");
+                            arquivo.WriteLine("                            " + tabela.ApelidoBo + " = " + pacoteORM + ".Library.BLL." + tabela.ClasseBo + ".newInstance();");
+                            arquivo.WriteLine("                        return " + tabela.ApelidoBo + ";");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                    catch (Exception err)");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        throw new Exception(err.Message);");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("            static " + tabela.Classe + "Web." + tabela.Classe + "SoapClient _" + tabela.Classe + "Web;");
+                            arquivo.WriteLine("            internal static " + tabela.Classe + "Web." + tabela.Classe + "SoapClient " + tabela.Classe + "Web");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                get");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    try");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        if (_" + tabela.Classe + "Web == null)");
+                            arquivo.WriteLine("                            _" + tabela.Classe + "Web = new " + tabela.Classe + "Web." + tabela.Classe + "SoapClient();");
+                            arquivo.WriteLine("                        return _" + tabela.Classe + "Web;");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                    catch (Exception err)");
+                            arquivo.WriteLine("                    {");
+                            arquivo.WriteLine("                        throw new Exception(err.Message);");
+                            arquivo.WriteLine("                    }");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("        public bool Salvar(" + tabela.ClasseInfo + " _obj, MySqlTransaction _trans)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            try");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                if (Configuracoes.WebService)");
+                            arquivo.WriteLine("                    return Accessor." + tabela.Classe + "Web.Salvar(InfoLocalToInfoWeb(_obj));");
+                            arquivo.WriteLine("                else");
+                            arquivo.WriteLine("                    return Accessor." + tabela.ClasseBo + ".Salvar(_obj, _trans);");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            catch");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                throw;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("        public bool Salvar(" + tabela.ClasseInfo + " _obj)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            try");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                if (Configuracoes.WebService)");
+                            arquivo.WriteLine("                    return Accessor." + tabela.Classe + "Web.Salvar(InfoLocalToInfoWeb(_obj));");
+                            arquivo.WriteLine("                else");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    MySqlTransaction trans = Accessor.FuncoesDB.BeginTransaction();");
+                            arquivo.WriteLine("                    bool sucesso = Salvar(_obj, trans);");
+                            arquivo.WriteLine("                    if (sucesso)");
+                            arquivo.WriteLine("                        Accessor.FuncoesDB.CommitTransaction(trans);");
+                            arquivo.WriteLine("                    else");
+                            arquivo.WriteLine("                        Accessor.FuncoesDB.RollbackTransaction(trans);");
+                            arquivo.WriteLine("                    return sucesso;");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            catch");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                throw;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("        public bool Excluir(long Id, MySqlTransaction _trans)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            try");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                if (Configuracoes.WebService)");
+                            arquivo.WriteLine("                    return Accessor." + tabela.Classe + "Web.ExcluirPorId(Id);");
+                            arquivo.WriteLine("                else");
+                            arquivo.WriteLine("                    return Accessor." + tabela.ClasseBo + ".Excluir(Id, _trans);");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            catch");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                throw;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("        public bool Excluir(long Id)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            try");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                if (Configuracoes.WebService)");
+                            arquivo.WriteLine("                    return Accessor." + tabela.Classe + "Web.ExcluirPorId(Id);");
+                            arquivo.WriteLine("                else");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    MySqlTransaction trans = Accessor.FuncoesDB.BeginTransaction();");
+                            arquivo.WriteLine("                    bool sucesso = Excluir(Id, trans);");
+                            arquivo.WriteLine("                    if (sucesso)");
+                            arquivo.WriteLine("                        Accessor.FuncoesDB.CommitTransaction(trans);");
+                            arquivo.WriteLine("                    else");
+                            arquivo.WriteLine("                        Accessor.FuncoesDB.RollbackTransaction(trans);");
+                            arquivo.WriteLine("                    return sucesso;");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            catch");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                throw;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("        public " + tabela.ClasseInfo + " RetornaPorId(long Id, bool lazyLoading = false)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            try");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                if (Configuracoes.WebService)");
+                            arquivo.WriteLine("                    return InfoLocalFromInfoWeb(Accessor." + tabela.Classe + "Web.RetornaPorId(Id));");
+                            arquivo.WriteLine("                else");
+                            arquivo.WriteLine("                    return Accessor." + tabela.ClasseBo + ".RetornaPorId(Id, lazyLoading);");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            catch");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                throw;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+
+                            string parametroLazyLoading = string.Empty;
+                            string variavelLazyLoading = string.Empty;
+
+                            List<ColunaInfo> joins = new List<ColunaInfo>();
+                            foreach (ColunaInfo c in tabela.colunas)
+                            {
+                                bool lista = false;
+                                bool join = false;
+
+                                if (CriarSelect(c.Descricao, ref lista, ref join))
+                                {
+                                    if (join)
+                                    {
+                                        joins.Add(c);
+
+                                        parametroLazyLoading = ", bool lazyLoading = false";
+                                        variavelLazyLoading = ", lazyLoading";
+                                    }
+
+                                    string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+
+                                    if (variavel.Equals("integer"))
+                                        variavel = "int";
+
+                                    string pesquisaPor = "Por" + c.Descricao;
+
+                                    if (!lista)
+                                    {
+                                        arquivo.WriteLine("        public " + tabela.ClasseInfo + " Retorna" + pesquisaPor + "(" + variavel + " " + c.Descricao + parametroLazyLoading + ")");
+                                        arquivo.WriteLine("        {");
+                                        arquivo.WriteLine("            try");
+                                        arquivo.WriteLine("            {");
+                                        arquivo.WriteLine("                if (Configuracoes.WebService)");
+                                        arquivo.WriteLine("                    return InfoLocalFromInfoWeb(Accessor." + tabela.Classe + "Web.Retorna" + pesquisaPor + "(" + c.Descricao + "));");
+                                        arquivo.WriteLine("                else");
+                                        arquivo.WriteLine("                    return Accessor." + tabela.ClasseBo + ".Retorna" + pesquisaPor + "(" + c.Descricao + variavelLazyLoading + ");");
+                                        arquivo.WriteLine("            }");
+                                        arquivo.WriteLine("            catch");
+                                        arquivo.WriteLine("            {");
+                                        arquivo.WriteLine("                throw;");
+                                        arquivo.WriteLine("            }");
+                                        arquivo.WriteLine("        }");
+                                        arquivo.WriteLine("");
+                                    }
+                                    else
+                                    {
+                                        arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + variavel + " " + c.Descricao + parametroLazyLoading + ")");
+                                        arquivo.WriteLine("        {");
+                                        arquivo.WriteLine("            try");
+                                        arquivo.WriteLine("            {");
+                                        arquivo.WriteLine("                if (Configuracoes.WebService)");
+                                        arquivo.WriteLine("                {");
+                                        arquivo.WriteLine("                    List<" + tabela.Classe + "Web." + tabela.ClasseInfo + "> lst = new List<" + tabela.Classe + "Web." + tabela.ClasseInfo + ">(Accessor." + tabela.Classe + "Web.Retorna" + pesquisaPor + "(" + c.Descricao + "));");
+                                        arquivo.WriteLine("");
+                                        arquivo.WriteLine("                    return ListLocalFromListWeb(lst);");
+                                        arquivo.WriteLine("                }");
+                                        arquivo.WriteLine("                else");
+                                        arquivo.WriteLine("                    return Accessor." + tabela.ClasseBo + ".Retorna" + pesquisaPor + "(" + c.Descricao + variavelLazyLoading + ");");
+                                        arquivo.WriteLine("            }");
+                                        arquivo.WriteLine("            catch");
+                                        arquivo.WriteLine("            {");
+                                        arquivo.WriteLine("                throw;");
+                                        arquivo.WriteLine("            }");
+                                        arquivo.WriteLine("        }");
+                                        arquivo.WriteLine("");
+                                    }
+                                }
+                            }
+
+                            if (joins.Count > 1)
+                            {
+                                StringBuilder parametros = new StringBuilder();
+                                StringBuilder parametrosPassar = new StringBuilder();
+
+                                foreach (ColunaInfo c in joins)
+                                {
+                                    string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+
+                                    parametros.Append(variavel + " " + c.Descricao + ", ");
+
+                                    parametrosPassar.Append(c.Descricao + ", ");
+                                }
+
+                                arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaPorParametros(" + parametros.ToString().Remove(parametros.Length - 2, 2) + parametroLazyLoading + ")");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                if (Configuracoes.WebService)");
+                                arquivo.WriteLine("                {");
+                                arquivo.WriteLine("                    List<" + tabela.Classe + "Web." + tabela.ClasseInfo + "> lst = new List<" + tabela.Classe + "Web." + tabela.ClasseInfo + ">(Accessor." + tabela.Classe + "Web.RetornaPorParametros(" + parametrosPassar.ToString().Remove(parametrosPassar.Length - 2, 2) + ");");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("                    return ListLocalFromListWeb(lst);");
+                                arquivo.WriteLine("                }");
+                                arquivo.WriteLine("                else");
+                                arquivo.WriteLine("                    return Accessor." + tabela.ClasseBo + ".RetornaPorParametros(" + parametrosPassar.ToString().Remove(parametrosPassar.Length - 2, 2) + variavelLazyLoading + ");");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                throw;");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+
+                            arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaTodos(" + (parametroLazyLoading.Length > 0 ? parametroLazyLoading.Substring(2) : "") + ")");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            try");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                if (Configuracoes.WebService)");
+                            arquivo.WriteLine("                {");
+                            arquivo.WriteLine("                    List<" + tabela.Classe + "Web." + tabela.ClasseInfo + "> lst = new List<" + tabela.Classe + "Web." + tabela.ClasseInfo + ">(Accessor." + tabela.Classe + "Web.RetornaTodos());");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("                    return ListLocalFromListWeb(lst);");
+                            arquivo.WriteLine("                }");
+                            arquivo.WriteLine("                else");
+                            arquivo.WriteLine("                    return Accessor." + tabela.ClasseBo + ".RetornaTodos(" + (variavelLazyLoading.Length > 0 ? variavelLazyLoading.Substring(2) : "") + ");");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("            catch");
+                            arquivo.WriteLine("            {");
+                            arquivo.WriteLine("                throw;");
+                            arquivo.WriteLine("            }");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("        protected List<" + tabela.ClasseInfo + "> ListLocalFromListWeb(List<" + tabela.Classe + "Web." + tabela.ClasseInfo + "> lst)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> lstFinal = new List<" + tabela.ClasseInfo + ">();");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("            foreach (" + tabela.Classe + "Web." + tabela.ClasseInfo + " p in lst)");
+                            arquivo.WriteLine("                lstFinal.Add(InfoLocalFromInfoWeb(p));");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("            return lstFinal;");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("        protected " + tabela.Classe + "Web." + tabela.ClasseInfo + " InfoLocalToInfoWeb(" + tabela.ClasseInfo + " info)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            " + tabela.Classe + "Web." + tabela.ClasseInfo + " " + tabela.ApelidoInfo + " = new " + tabela.Classe + "Web." + tabela.ClasseInfo + "();");
+                            arquivo.WriteLine("");
+                            // Cria new info do data reader
+                            foreach (ColunaInfo c in tabela.colunas)
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = info." + c.Descricao + ";");
+
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("            return " + tabela.ApelidoInfo + ";");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("        protected " + tabela.ClasseInfo + " InfoLocalFromInfoWeb(" + tabela.Classe + "Web." + tabela.ClasseInfo + " info)");
+                            arquivo.WriteLine("        {");
+                            arquivo.WriteLine("            " + tabela.ClasseInfo + " " + tabela.ApelidoInfo + " = new " + tabela.ClasseInfo + "();");
+                            arquivo.WriteLine("");
+                            // Cria new info do data reader
+                            foreach (ColunaInfo c in tabela.colunas)
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = info." + c.Descricao + ";");
+
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("            return " + tabela.ApelidoInfo + ";");
+                            arquivo.WriteLine("        }");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("    }");
+                            arquivo.WriteLine("}");
+
+                            arquivo.Flush();
+                            arquivo.Close();
+                        }
+                    }
+                    #endregion
+
+                    #region CriaArquivo COMUNICADOR BLL
+                    if (chkWebService.Checked && !string.IsNullOrEmpty(txtPacoteWebService.Text))
+                    {
+                        bool newInstance = !chkComunicadorSemNewInstance.Checked;
+
+                        File.Create(diretorio + "\\Comunicador\\BLL\\" + tabela.ArquivoBo).Close();
+                        using (TextWriter arquivo = File.AppendText(diretorio + "\\Comunicador\\BLL\\" + tabela.ArquivoBo))
+                        {
+                            if (newInstance)
+                                arquivo.WriteLine("using " + pacote + ".Util;");
+                            arquivo.WriteLine("using " + pacoteORM + ".BaseObjects;");
+                            arquivo.WriteLine("using " + pacoteORM + ".Util;");
+                            arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
+                            arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
+                            arquivo.WriteLine("using System;");
+                            arquivo.WriteLine("using MySql.Data.MySqlClient;");
+                            arquivo.WriteLine("using System.Collections.Generic;");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("namespace " + pacote + ".Library.BLL");
+                            arquivo.WriteLine("{");
+                            arquivo.WriteLine("    public partial class " + tabela.ClasseBo);
+                            arquivo.WriteLine("    {");
+                            arquivo.WriteLine("");
+                            arquivo.WriteLine("    }");
+                            arquivo.WriteLine("}");
+
+                            arquivo.Flush();
+                            arquivo.Close();
+                        }
+                    }
+                    #endregion
                 }
 
                 if (tabelas.Count > 0)
                 {
                     #region CriaArquivo DAOFactory
-                    File.Create(diretorio + "\\DAL\\DAOFactory.cs").Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\DAL\\DAOFactory.cs"))
+                    File.Create(diretorio + "\\ORM\\DAL\\DAOFactory.cs").Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\DAL\\DAOFactory.cs"))
                     {
-                        arquivo.WriteLine("namespace " + txtPacote.Text + ".Library.DAL");
+                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.DAL");
                         arquivo.WriteLine("{");
                         arquivo.WriteLine("    public class DAOFactory");
                         arquivo.WriteLine("    {");
@@ -1291,7 +2534,8 @@ namespace GeradorCamadaCSharp
 
             if (coluna.Contains("CODIGO") || coluna.Contains("NUMERO") || coluna.Equals("EAN") || coluna.Equals("CPF") || coluna.Equals("CNPJ"))
             { }
-            else if (coluna.Contains("DESCRICAO") || coluna.Contains("NOME") || coluna.Contains("RAZAO") || coluna.Contains("FANTASIA"))
+            else if (coluna.Contains("DESCRICAO") || coluna.Contains("NOME") || coluna.Contains("RAZAO") || coluna.Contains("FANTASIA")
+                || coluna.Equals("LOJA") || coluna.Equals("IDLOJA") || coluna.Equals("ID_LOJA"))
             {
                 lista = true;
             }
@@ -1382,6 +2626,11 @@ namespace GeradorCamadaCSharp
                 dgTabelasAlteradas.CurrentRow.Cells["ordenar"].Value = "0";
 
             AjustarGrid();
+        }
+
+        private void chkWebService_CheckedChanged(object sender, EventArgs e)
+        {
+            rdbREST.Visible = rdbSOAP.Visible = chkComunicadorSemNewInstance.Visible = lblPacoteWebService.Visible = txtPacoteWebService.Visible = chkWebService.Checked;
         }
     }
 

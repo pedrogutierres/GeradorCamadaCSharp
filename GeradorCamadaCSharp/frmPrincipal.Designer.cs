@@ -43,6 +43,10 @@
             this.ordenar = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.novaTabela = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.chkComunicadorSemNewInstance = new System.Windows.Forms.CheckBox();
+            this.lblPacoteWebService = new System.Windows.Forms.Label();
+            this.txtPacoteWebService = new System.Windows.Forms.TextBox();
+            this.chkWebService = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.txtPacote = new System.Windows.Forms.TextBox();
             this.btnCancelar = new System.Windows.Forms.Button();
@@ -51,6 +55,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.cmbDatabase = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.rdbSOAP = new System.Windows.Forms.RadioButton();
+            this.rdbREST = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabAtualiza.SuspendLayout();
@@ -201,6 +207,12 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.rdbREST);
+            this.groupBox3.Controls.Add(this.rdbSOAP);
+            this.groupBox3.Controls.Add(this.chkComunicadorSemNewInstance);
+            this.groupBox3.Controls.Add(this.lblPacoteWebService);
+            this.groupBox3.Controls.Add(this.txtPacoteWebService);
+            this.groupBox3.Controls.Add(this.chkWebService);
             this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Controls.Add(this.txtPacote);
             this.groupBox3.Controls.Add(this.btnCancelar);
@@ -214,6 +226,46 @@
             this.groupBox3.Size = new System.Drawing.Size(344, 288);
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
+            // 
+            // chkComunicadorSemNewInstance
+            // 
+            this.chkComunicadorSemNewInstance.AutoSize = true;
+            this.chkComunicadorSemNewInstance.Location = new System.Drawing.Point(79, 185);
+            this.chkComunicadorSemNewInstance.Name = "chkComunicadorSemNewInstance";
+            this.chkComunicadorSemNewInstance.Size = new System.Drawing.Size(174, 17);
+            this.chkComunicadorSemNewInstance.TabIndex = 16;
+            this.chkComunicadorSemNewInstance.Text = "Comunicador sem newInstance";
+            this.chkComunicadorSemNewInstance.UseVisualStyleBackColor = true;
+            this.chkComunicadorSemNewInstance.Visible = false;
+            // 
+            // lblPacoteWebService
+            // 
+            this.lblPacoteWebService.AutoSize = true;
+            this.lblPacoteWebService.Location = new System.Drawing.Point(7, 137);
+            this.lblPacoteWebService.Name = "lblPacoteWebService";
+            this.lblPacoteWebService.Size = new System.Drawing.Size(66, 26);
+            this.lblPacoteWebService.TabIndex = 15;
+            this.lblPacoteWebService.Text = "Pacote\r\nWebService";
+            this.lblPacoteWebService.Visible = false;
+            // 
+            // txtPacoteWebService
+            // 
+            this.txtPacoteWebService.Location = new System.Drawing.Point(79, 143);
+            this.txtPacoteWebService.Name = "txtPacoteWebService";
+            this.txtPacoteWebService.Size = new System.Drawing.Size(222, 20);
+            this.txtPacoteWebService.TabIndex = 14;
+            this.txtPacoteWebService.Visible = false;
+            // 
+            // chkWebService
+            // 
+            this.chkWebService.AutoSize = true;
+            this.chkWebService.Location = new System.Drawing.Point(79, 105);
+            this.chkWebService.Name = "chkWebService";
+            this.chkWebService.Size = new System.Drawing.Size(117, 17);
+            this.chkWebService.TabIndex = 13;
+            this.chkWebService.Text = "Gerar Web Service";
+            this.chkWebService.UseVisualStyleBackColor = true;
+            this.chkWebService.CheckedChanged += new System.EventHandler(this.chkWebService_CheckedChanged);
             // 
             // label1
             // 
@@ -297,6 +349,30 @@
             this.cmbDatabase.Size = new System.Drawing.Size(222, 21);
             this.cmbDatabase.TabIndex = 6;
             // 
+            // rdbSOAP
+            // 
+            this.rdbSOAP.AutoSize = true;
+            this.rdbSOAP.Location = new System.Drawing.Point(79, 241);
+            this.rdbSOAP.Name = "rdbSOAP";
+            this.rdbSOAP.Size = new System.Drawing.Size(54, 17);
+            this.rdbSOAP.TabIndex = 17;
+            this.rdbSOAP.Text = "SOAP";
+            this.rdbSOAP.UseVisualStyleBackColor = true;
+            this.rdbSOAP.Visible = false;
+            // 
+            // rdbREST
+            // 
+            this.rdbREST.AutoSize = true;
+            this.rdbREST.Checked = true;
+            this.rdbREST.Location = new System.Drawing.Point(79, 218);
+            this.rdbREST.Name = "rdbREST";
+            this.rdbREST.Size = new System.Drawing.Size(54, 17);
+            this.rdbREST.TabIndex = 18;
+            this.rdbREST.TabStop = true;
+            this.rdbREST.Text = "REST";
+            this.rdbREST.UseVisualStyleBackColor = true;
+            this.rdbREST.Visible = false;
+            // 
             // frmPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -345,6 +421,12 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtPacote;
+        private System.Windows.Forms.CheckBox chkWebService;
+        private System.Windows.Forms.Label lblPacoteWebService;
+        private System.Windows.Forms.TextBox txtPacoteWebService;
+        private System.Windows.Forms.CheckBox chkComunicadorSemNewInstance;
+        private System.Windows.Forms.RadioButton rdbREST;
+        private System.Windows.Forms.RadioButton rdbSOAP;
     }
 }
 
