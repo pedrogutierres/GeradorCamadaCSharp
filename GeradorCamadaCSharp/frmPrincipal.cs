@@ -89,6 +89,11 @@ namespace GeradorCamadaCSharp
                         ApelidoPlural = Classe.Substring(0, 1).ToLower() + (Classe.Length > 1 ? Classe.Substring(1) : "");
                         Classe = Classe.Remove(Classe.Length - 3, 3) + "ao";
                     }
+                    else if (Classe.ToLower().EndsWith("ais"))
+                    {
+                        ApelidoPlural = Classe.Substring(0, 1).ToLower() + (Classe.Length > 1 ? Classe.Substring(1) : "");
+                        Classe = Classe.Remove(Classe.Length - 3, 3) + "al";
+                    }
                     else if (Classe.ToLower().EndsWith("paes"))
                     {
                         ApelidoPlural = Classe.Substring(0, 1).ToLower() + (Classe.Length > 1 ? Classe.Substring(1) : "");
@@ -131,6 +136,8 @@ namespace GeradorCamadaCSharp
                             ApelidoPlural = ApelidoInfo.Remove(ApelidoInfo.Length - 2, 2) + "aes";
                         else if (ApelidoInfo.EndsWith("ao"))
                             ApelidoPlural = ApelidoInfo.Remove(ApelidoInfo.Length - 2, 2) + "oes";
+                        else if (ApelidoInfo.EndsWith("al"))
+                            ApelidoPlural = ApelidoInfo.Remove(ApelidoInfo.Length - 2, 2) + "ais";
                         else if (ApelidoInfo.EndsWith("r"))
                             ApelidoPlural = ApelidoInfo + "es";
                         else if (ApelidoInfo.EndsWith("m"))
@@ -436,6 +443,8 @@ namespace GeradorCamadaCSharp
                 string pacoteORM = chkWebService.Checked ? "ORM" : txtPacote.Text;
                 string pacote = txtPacote.Text;
                 string pacoteWebService = chkWebService.Checked && !string.IsNullOrEmpty(txtPacoteWebService.Text) ? txtPacoteWebService.Text : pacote;
+                string stringConexaoParams = chkStringConexao.Checked ? "string strConexao, " : "";
+                string stringConexao = chkStringConexao.Checked ? "strConexao, " : "";
 
                 string comando = @"
                     SELECT *, 0 as ordenar
@@ -684,11 +693,11 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("                throw;");
                         arquivo.WriteLine("            }");
                         arquivo.WriteLine("        }");
-                        arquivo.WriteLine("        public bool Salvar(" + tabela.ClasseInfo + " _obj)");
+                        arquivo.WriteLine("        public bool Salvar(" + stringConexaoParams + tabela.ClasseInfo + " _obj)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            try");
                         arquivo.WriteLine("            {");
-                        arquivo.WriteLine("                MySqlTransaction trans = mFuncoes.BeginTransaction();");
+                        arquivo.WriteLine("                MySqlTransaction trans = mFuncoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
                         arquivo.WriteLine("                bool sucesso = Salvar(_obj, trans);");
                         arquivo.WriteLine("                if (sucesso)");
                         arquivo.WriteLine("                    mFuncoes.CommitTransaction(trans);");
@@ -713,11 +722,11 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("                throw;");
                         arquivo.WriteLine("            }");
                         arquivo.WriteLine("        }");
-                        arquivo.WriteLine("        public bool Excluir(long Id)");
+                        arquivo.WriteLine("        public bool Excluir(" + stringConexaoParams + "long Id)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            try");
                         arquivo.WriteLine("            {");
-                        arquivo.WriteLine("                MySqlTransaction trans = mFuncoes.BeginTransaction();");
+                        arquivo.WriteLine("                MySqlTransaction trans = mFuncoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
                         arquivo.WriteLine("                bool sucesso = Excluir(Id, trans);");
                         arquivo.WriteLine("                if (sucesso)");
                         arquivo.WriteLine("                    mFuncoes.CommitTransaction(trans);");
@@ -731,11 +740,11 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("            }");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("        public " + tabela.ClasseInfo + " RetornaPorId(long Id, bool lazyLoading = false)");
+                        arquivo.WriteLine("        public " + tabela.ClasseInfo + " RetornaPorId(" + stringConexaoParams + "long Id, bool lazyLoading = false)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            try");
                         arquivo.WriteLine("            {");
-                        arquivo.WriteLine("                return " + tabela.ApelidoDao + ".RetornaPorId(Id, lazyLoading);");
+                        arquivo.WriteLine("                return " + tabela.ApelidoDao + ".RetornaPorId(" + stringConexao + "Id, lazyLoading);");
                         arquivo.WriteLine("            }");
                         arquivo.WriteLine("            catch");
                         arquivo.WriteLine("            {");
@@ -772,11 +781,11 @@ namespace GeradorCamadaCSharp
 
                                 if (!lista)
                                 {
-                                    arquivo.WriteLine("        public " + tabela.ClasseInfo + " Retorna" + pesquisaPor + "(" + variavel + " " + c.Descricao + parametroLazyLoading + ")");
+                                    arquivo.WriteLine("        public " + tabela.ClasseInfo + " Retorna" + pesquisaPor + "(" + stringConexaoParams + variavel + " " + c.Descricao + parametroLazyLoading + ")");
                                     arquivo.WriteLine("        {");
                                     arquivo.WriteLine("            try");
                                     arquivo.WriteLine("            {");
-                                    arquivo.WriteLine("                return " + tabela.ApelidoDao + ".Retorna" + pesquisaPor + "(" + c.Descricao + variavelLazyLoading + ");");
+                                    arquivo.WriteLine("                return " + tabela.ApelidoDao + ".Retorna" + pesquisaPor + "(" + stringConexao + c.Descricao + variavelLazyLoading + ");");
                                     arquivo.WriteLine("            }");
                                     arquivo.WriteLine("            catch");
                                     arquivo.WriteLine("            {");
@@ -787,11 +796,11 @@ namespace GeradorCamadaCSharp
                                 }
                                 else
                                 {
-                                    arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + variavel + " " + c.Descricao + parametroLazyLoading + ")");
+                                    arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + stringConexaoParams + variavel + " " + c.Descricao + parametroLazyLoading + ")");
                                     arquivo.WriteLine("        {");
                                     arquivo.WriteLine("            try");
                                     arquivo.WriteLine("            {");
-                                    arquivo.WriteLine("                return " + tabela.ApelidoDao + ".Retorna" + pesquisaPor + "(" + c.Descricao + variavelLazyLoading + ");");
+                                    arquivo.WriteLine("                return " + tabela.ApelidoDao + ".Retorna" + pesquisaPor + "(" + stringConexao + c.Descricao + variavelLazyLoading + ");");
                                     arquivo.WriteLine("            }");
                                     arquivo.WriteLine("            catch");
                                     arquivo.WriteLine("            {");
@@ -817,11 +826,11 @@ namespace GeradorCamadaCSharp
                                 parametrosPassar.Append(c.Descricao + ", ");
                             }
 
-                            arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaPorParametros(" + parametros.ToString().Remove(parametros.Length - 2, 2) + parametroLazyLoading + ")");
+                            arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaPorParametros(" + stringConexaoParams + parametros.ToString().Remove(parametros.Length - 2, 2) + parametroLazyLoading + ")");
                             arquivo.WriteLine("        {");
                             arquivo.WriteLine("            try");
                             arquivo.WriteLine("            {");
-                            arquivo.WriteLine("                return " + tabela.ApelidoDao + ".RetornaPorParametros(" + parametrosPassar.ToString().Remove(parametrosPassar.Length - 2, 2) + variavelLazyLoading + ");");
+                            arquivo.WriteLine("                return " + tabela.ApelidoDao + ".RetornaPorParametros(" + stringConexao + parametrosPassar.ToString().Remove(parametrosPassar.Length - 2, 2) + variavelLazyLoading + ");");
                             arquivo.WriteLine("            }");
                             arquivo.WriteLine("            catch");
                             arquivo.WriteLine("            {");
@@ -831,11 +840,11 @@ namespace GeradorCamadaCSharp
                             arquivo.WriteLine("");
                         }
 
-                        arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaTodos(" + (parametroLazyLoading.Length > 0 ? parametroLazyLoading.Substring(2) : "") + ")");
+                        arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaTodos(" + (parametroLazyLoading.Length > 0 ? stringConexaoParams + parametroLazyLoading.Substring(2) : stringConexaoParams.Replace(", ", "")) + ")");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            try");
                         arquivo.WriteLine("            {");
-                        arquivo.WriteLine("                return " + tabela.ApelidoDao + ".RetornaTodos(" + (variavelLazyLoading.Length > 0 ? variavelLazyLoading.Substring(2) : "") + ");");
+                        arquivo.WriteLine("                return " + tabela.ApelidoDao + ".RetornaTodos(" + (variavelLazyLoading.Length > 0 ? stringConexao + variavelLazyLoading.Substring(2) : stringConexao.Replace(", ", "")) + ");");
                         arquivo.WriteLine("            }");
                         arquivo.WriteLine("            catch");
                         arquivo.WriteLine("            {");
@@ -999,12 +1008,12 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("            return mFuncoes.ExecuteNonQuery(_trans, CommandType.Text, cmdExcluiPorId, parms);");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("        public " + tabela.ClasseInfo + " RetornaPorId(long " + chavePrimaria + ", bool lazyLoading = false)");
+                        arquivo.WriteLine("        public " + tabela.ClasseInfo + " RetornaPorId(" + stringConexaoParams + "long " + chavePrimaria + ", bool lazyLoading = false)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            MySqlParameter[] parms = new MySqlParameter[1];");
                         arquivo.WriteLine("            parms[0] = mFuncoes.CreateParameter(param" + chavePrimaria + ", MySqlDbType.Int64, " + chavePrimaria + ");");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("            using (MySqlDataReader rdr = mFuncoes.ExecuteReader(CommandType.Text, cmdRetornaPorId, parms))");
+                        arquivo.WriteLine("            using (MySqlDataReader rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaPorId, parms))");
                         arquivo.WriteLine("            {");
                         arquivo.WriteLine("                if (rdr.Read())");
                         arquivo.WriteLine("                    return New" + tabela.ClasseInfo + "(rdr, lazyLoading);");
@@ -1039,12 +1048,12 @@ namespace GeradorCamadaCSharp
 
                                 if (!lista)
                                 {
-                                    arquivo.WriteLine("        public " + tabela.ClasseInfo + " Retorna" + pesquisaPor + "(" + variavel + " " + c.Descricao + ", bool lazyLoading = false)");
+                                    arquivo.WriteLine("        public " + tabela.ClasseInfo + " Retorna" + pesquisaPor + "(" + stringConexaoParams + variavel + " " + c.Descricao + ", bool lazyLoading = false)");
                                     arquivo.WriteLine("        {");
                                     arquivo.WriteLine("            MySqlParameter[] parms = new MySqlParameter[1];");
                                     arquivo.WriteLine("            parms[0] = mFuncoes.CreateParameter(param" + c.Descricao + ", MySqlDbType." + variavelMySqlType + ", " + c.Descricao + ");");
                                     arquivo.WriteLine("");
-                                    arquivo.WriteLine("            using (MySqlDataReader rdr = mFuncoes.ExecuteReader(CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
+                                    arquivo.WriteLine("            using (MySqlDataReader rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
                                     arquivo.WriteLine("            {");
                                     arquivo.WriteLine("                if (rdr.Read())");
                                     arquivo.WriteLine("                    return New" + tabela.ClasseInfo + "(rdr, lazyLoading);");
@@ -1055,13 +1064,13 @@ namespace GeradorCamadaCSharp
                                 }
                                 else
                                 {
-                                    arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + variavel + " " + c.Descricao + ", bool lazyLoading = false)");
+                                    arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + stringConexaoParams + variavel + " " + c.Descricao + ", bool lazyLoading = false)");
                                     arquivo.WriteLine("        {");
                                     arquivo.WriteLine("            MySqlParameter[] parms = new MySqlParameter[1];");
                                     arquivo.WriteLine("            parms[0] = mFuncoes.CreateParameter(param" + c.Descricao + ", MySqlDbType." + variavelMySqlType + ", " + c.Descricao + ");");
                                     arquivo.WriteLine("");
                                     arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> lst = new List<" + tabela.ClasseInfo + ">();");
-                                    arquivo.WriteLine("            using (MySqlDataReader rdr = mFuncoes.ExecuteReader(CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
+                                    arquivo.WriteLine("            using (MySqlDataReader rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
                                     arquivo.WriteLine("            {");
                                     arquivo.WriteLine("                while (rdr.Read())");
                                     arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(rdr, lazyLoading));");
@@ -1084,7 +1093,7 @@ namespace GeradorCamadaCSharp
                                 parametros.Append(variavel + " " + c.Descricao + ", ");
                             }
 
-                            arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaPorParametros(" + parametros.ToString().Remove(parametros.Length - 2, 2) + ", bool lazyLoading = false)");
+                            arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaPorParametros(" + stringConexaoParams + parametros.ToString().Remove(parametros.Length - 2, 2) + ", bool lazyLoading = false)");
                             arquivo.WriteLine("        {");
                             arquivo.WriteLine("            MySqlParameter[] parms = new MySqlParameter[" + joins.Count + "];");
 
@@ -1112,7 +1121,7 @@ namespace GeradorCamadaCSharp
 
                             arquivo.WriteLine("");
                             arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> lst = new List<" + tabela.ClasseInfo + ">();");
-                            arquivo.WriteLine("            using (MySqlDataReader rdr = mFuncoes.ExecuteReader(CommandType.Text, cmdRetornaPorParametros, parms))");
+                            arquivo.WriteLine("            using (MySqlDataReader rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaPorParametros, parms))");
                             arquivo.WriteLine("            {");
                             arquivo.WriteLine("                while (rdr.Read())");
                             arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(rdr, lazyLoading));");
@@ -1122,10 +1131,10 @@ namespace GeradorCamadaCSharp
                             arquivo.WriteLine("");
                         }
 
-                        arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaTodos(bool lazyLoading = false)");
+                        arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaTodos(" + stringConexaoParams + "bool lazyLoading = false)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> lst = new List<" + tabela.ClasseInfo + ">();");
-                        arquivo.WriteLine("            using (MySqlDataReader rdr = mFuncoes.ExecuteReader(CommandType.Text, cmdRetornaTodos, null))");
+                        arquivo.WriteLine("            using (MySqlDataReader rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaTodos, null))");
                         arquivo.WriteLine("            {");
                         arquivo.WriteLine("                while (rdr.Read())");
                         arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(rdr, lazyLoading));");
