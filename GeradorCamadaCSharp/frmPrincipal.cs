@@ -419,9 +419,6 @@ namespace GeradorCamadaCSharp
                 if (!Directory.Exists(diretorio + "\\ORM\\Model"))
                     Directory.CreateDirectory(diretorio + "\\ORM\\Model");
 
-                if (!Directory.Exists(diretorio + "\\ORM\\BaseBLL"))
-                    Directory.CreateDirectory(diretorio + "\\ORM\\BaseBLL");
-
                 if (!Directory.Exists(diretorio + "\\ORM\\BLL"))
                     Directory.CreateDirectory(diretorio + "\\ORM\\BLL");
 
@@ -650,8 +647,8 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo Base BLL
-                    File.Create(diretorio + "\\ORM\\BaseBLL\\" + tabela.ArquivoBo).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BaseBLL\\" + tabela.ArquivoBo))
+                    File.Create(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo))
                     {
                         arquivo.WriteLine("using " + pacoteORM + ".BaseObjects;");
                         arquivo.WriteLine("using " + pacoteORM + ".Util;");
@@ -663,7 +660,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("");
                         arquivo.WriteLine("namespace " + pacoteORM + ".Library.BLL");
                         arquivo.WriteLine("{");
-                        arquivo.WriteLine("    public partial class " + tabela.ClasseBo);
+                        arquivo.WriteLine("    public class " + tabela.ClasseBo);
                         arquivo.WriteLine("    {");
                         arquivo.WriteLine("        private static " + tabela.ClasseBo + " " + tabela.ApelidoBo + ";");
                         arquivo.WriteLine("        private static Funcoes mFuncoes;");
@@ -851,31 +848,6 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("                throw;");
                         arquivo.WriteLine("            }");
                         arquivo.WriteLine("        }");
-                        arquivo.WriteLine("    }");
-                        arquivo.WriteLine("}");
-
-                        arquivo.Flush();
-                        arquivo.Close();
-                    }
-                    #endregion
-
-                    #region CriaArquivo BLL
-                    File.Create(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo))
-                    {
-                        arquivo.WriteLine("using " + pacoteORM + ".BaseObjects;");
-                        arquivo.WriteLine("using " + pacoteORM + ".Util;");
-                        arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
-                        arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
-                        arquivo.WriteLine("using System;");
-                        arquivo.WriteLine("using MySql.Data.MySqlClient;");
-                        arquivo.WriteLine("using System.Collections.Generic;");
-                        arquivo.WriteLine("");
-                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.BLL");
-                        arquivo.WriteLine("{");
-                        arquivo.WriteLine("    public partial class " + tabela.ClasseBo);
-                        arquivo.WriteLine("    {");
-                        arquivo.WriteLine("");
                         arquivo.WriteLine("    }");
                         arquivo.WriteLine("}");
 
@@ -2025,7 +1997,7 @@ namespace GeradorCamadaCSharp
                     }
                     #endregion
 
-                    #region CriarArquivo WebService
+                    #region CriaArquivo WebService
                     if (chkWebService.Checked)
                     {
                         File.Create(diretorio + "\\WebService\\" + tabela.ArquivoWebService.Replace(".cs", "")).Close();
