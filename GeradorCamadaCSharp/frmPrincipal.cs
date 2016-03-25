@@ -419,6 +419,9 @@ namespace GeradorCamadaCSharp
                 if (!Directory.Exists(diretorio + "\\ORM\\Model"))
                     Directory.CreateDirectory(diretorio + "\\ORM\\Model");
 
+                if (!Directory.Exists(diretorio + "\\ORM\\BaseBLL"))
+                    Directory.CreateDirectory(diretorio + "\\ORM\\BaseBLL");
+
                 if (!Directory.Exists(diretorio + "\\ORM\\BLL"))
                     Directory.CreateDirectory(diretorio + "\\ORM\\BLL");
 
@@ -647,36 +650,28 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo Base BLL
-                    File.Create(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo))
+                    File.Create(diretorio + "\\ORM\\BaseBLL\\Base" + tabela.ArquivoBo).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BaseBLL\\Base" + tabela.ArquivoBo))
                     {
-                        arquivo.WriteLine("using " + pacoteORM + ".BaseObjects;");
-                        arquivo.WriteLine("using " + pacoteORM + ".Util;");
-                        arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
-                        arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
-                        arquivo.WriteLine("using System;");
                         arquivo.WriteLine("using MySql.Data.MySqlClient;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Util;");
+                        arquivo.WriteLine("using System;");
                         arquivo.WriteLine("using System.Collections.Generic;");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.BLL");
+                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.BaseBLL");
                         arquivo.WriteLine("{");
-                        arquivo.WriteLine("    public class " + tabela.ClasseBo);
+                        arquivo.WriteLine("    public abstract class Base" + tabela.ClasseBo);
                         arquivo.WriteLine("    {");
-                        arquivo.WriteLine("        private static " + tabela.ClasseBo + " " + tabela.ApelidoBo + ";");
-                        arquivo.WriteLine("        private static Funcoes mFuncoes;");
-                        arquivo.WriteLine("        private static " + tabela.ClasseDao + " " + tabela.ApelidoDao + ";");
+                        arquivo.WriteLine("        protected static Base" + tabela.ClasseBo + " " + tabela.ApelidoBo + ";");
+                        arquivo.WriteLine("        protected static Funcoes mFuncoes;");
+                        arquivo.WriteLine("        protected static " + tabela.ClasseDao + " " + tabela.ApelidoDao + ";");
                         arquivo.WriteLine("        ");
-                        arquivo.WriteLine("        private " + tabela.ClasseBo + "()");
+                        arquivo.WriteLine("        protected Base" + tabela.ClasseBo + "()");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            mFuncoes = Funcoes.newInstance();");
                         arquivo.WriteLine("            " + tabela.ApelidoDao + " = DAOFactory.get" + tabela.ClasseDao + "();");
-                        arquivo.WriteLine("        }");
-                        arquivo.WriteLine("");
-                        arquivo.WriteLine("        public static " + tabela.ClasseBo + " newInstance()");
-                        arquivo.WriteLine("        {");
-                        arquivo.WriteLine("            if (" + tabela.ApelidoBo + " == null)");
-                        arquivo.WriteLine("                " + tabela.ApelidoBo + " = new " + tabela.ClasseBo + "();");
-                        arquivo.WriteLine("            return " + tabela.ApelidoBo + ";");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("        public bool Salvar(" + tabela.ClasseInfo + " _obj, MySqlTransaction _trans)");
@@ -847,6 +842,39 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("            {");
                         arquivo.WriteLine("                throw;");
                         arquivo.WriteLine("            }");
+                        arquivo.WriteLine("        }");
+                        arquivo.WriteLine("    }");
+                        arquivo.WriteLine("}");
+
+                        arquivo.Flush();
+                        arquivo.Close();
+                    }
+                    #endregion
+
+                    #region CriaArquivo BLL
+                    File.Create(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo))
+                    {
+                        arquivo.WriteLine("using MySql.Data.MySqlClient;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.BaseBLL;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Library.Model;");
+                        arquivo.WriteLine("using " + pacoteORM + ".Util;");
+                        arquivo.WriteLine("using System;");
+                        arquivo.WriteLine("using System.Collections.Generic;");
+                        arquivo.WriteLine("");
+                        arquivo.WriteLine("namespace " + pacoteORM + ".Library.BLL");
+                        arquivo.WriteLine("{");
+                        arquivo.WriteLine("    public class " + tabela.ClasseBo + " : Base" + tabela.ClasseBo);
+                        arquivo.WriteLine("    {");
+                        arquivo.WriteLine("        private " + tabela.ClasseBo + "()");
+                        arquivo.WriteLine("        { }");
+                        arquivo.WriteLine("");
+                        arquivo.WriteLine("        public static " + tabela.ClasseBo + " newInstance()");
+                        arquivo.WriteLine("        {");
+                        arquivo.WriteLine("            if (" + tabela.ApelidoBo + " == null)");
+                        arquivo.WriteLine("                " + tabela.ApelidoBo + " = new " + tabela.ClasseBo + "();");
+                        arquivo.WriteLine("            return (" + tabela.ClasseBo + ")" + tabela.ApelidoBo + ";");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("    }");
                         arquivo.WriteLine("}");
