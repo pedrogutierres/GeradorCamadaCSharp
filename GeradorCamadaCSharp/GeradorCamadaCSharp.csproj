@@ -56,6 +56,7 @@
     <Compile Include="frmPrincipal.Designer.cs">
       <DependentUpon>frmPrincipal.cs</DependentUpon>
     </Compile>
+    <Compile Include="Library\ArquivoFuncoes.cs" />
     <Compile Include="Util\EnumDescription.cs" />
     <Compile Include="Util\Funcoes.cs" />
     <Compile Include="Program.cs" />

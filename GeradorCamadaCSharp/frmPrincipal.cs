@@ -73,10 +73,10 @@ namespace GeradorCamadaCSharp
                             }
                         }
 
-                        Classe = arquivo.ToString();
+                        Classe = (!string.IsNullOrEmpty(SiglaInicial) ? SiglaInicial + "_" : "") + arquivo.ToString();
                     }
                     else
-                        Classe = descricao.Substring(0, 1).ToUpper() + (descricao.Length > 1 ? descricao.Substring(1) : "");
+                        Classe = (!string.IsNullOrEmpty(SiglaInicial) ? SiglaInicial + "_" : "") + descricao.Substring(0, 1).ToUpper() + (descricao.Length > 1 ? descricao.Substring(1) : "");
 
                     // Troca plural
                     if (Classe.ToLower().EndsWith("oes"))
@@ -195,6 +195,8 @@ namespace GeradorCamadaCSharp
             public string ArquivoBo { get; private set; }
             public string ArquivoDao { get; private set; }
             public string ArquivoWebService { get; private set; }
+
+            public string SiglaInicial { get; set; }
 
             public List<ColunaInfo> colunas = null;
 
@@ -440,6 +442,9 @@ namespace GeradorCamadaCSharp
                 if (!Directory.Exists(diretorio + "\\Comunicador\\BLL"))
                     Directory.CreateDirectory(diretorio + "\\Comunicador\\BLL");
 
+                if (!Directory.Exists(diretorio + "\\Util"))
+                    Directory.CreateDirectory(diretorio + "\\Util");
+
                 string pacoteORM = chkWebService.Checked ? "ORM" : txtPacote.Text;
                 string pacote = txtPacote.Text;
                 string pacoteWebService = chkWebService.Checked && !string.IsNullOrEmpty(txtPacoteWebService.Text) ? txtPacoteWebService.Text : pacote;
@@ -463,6 +468,7 @@ namespace GeradorCamadaCSharp
                     string nomeTabela = r["table_name"].ToString().ToLower();
 
                     TabelaInfo tabela = new TabelaInfo();
+                    tabela.SiglaInicial = txtSiglaInicial.Text;
                     tabela.Descricao = nomeTabela;
 
                     tabelas.Add(tabela);
@@ -2456,6 +2462,17 @@ namespace GeradorCamadaCSharp
                         }
                     }
                     #endregion
+
+                    #region CriaArquivo Funcoes
+                    File.Create(diretorio + "\\Util\\Funcoes.cs").Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\Util\\Funcoes.cs"))
+                    {
+                        arquivo.Write(Library.ArquivoFuncoes.RetornaTextoArquivoFuncoes(txtPacote.Text));
+
+                        arquivo.Flush();
+                        arquivo.Close();
+                    }
+                    #endregion
                 }
 
                 if (tabelas.Count > 0)
@@ -2588,6 +2605,8 @@ namespace GeradorCamadaCSharp
                 Accessor.Funcoes.Aviso("Terminou.");
 
                 Process.Start("explorer.exe", Application.StartupPath + "\\" + "tempTabelas\\");
+
+                ControlaBotoes(true, true, true);
             }
             catch (Exception ex)
             {
