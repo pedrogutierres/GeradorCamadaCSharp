@@ -760,7 +760,7 @@ namespace GeradorCamadaCSharp
                             bool lista = false;
                             bool join = false;
 
-                            if (CriarSelect(c.Descricao, ref lista, ref join))
+                            if (CriarSelect(c, ref lista, ref join))
                             {
                                 if (join)
                                 {
@@ -963,7 +963,7 @@ namespace GeradorCamadaCSharp
                             bool lista = false;
                             bool join = false;
 
-                            if (CriarSelect(c.Descricao, ref lista, ref join))
+                            if (CriarSelect(c, ref lista, ref join))
                             {
                                 if (join)
                                     joins.Add(c);
@@ -1033,7 +1033,7 @@ namespace GeradorCamadaCSharp
                             bool lista = false;
                             bool join = false;
 
-                            if (CriarSelect(c.Descricao, ref lista, ref join))
+                            if (CriarSelect(c, ref lista, ref join))
                             {
                                 string variavel = EnumDescription.GetDescription(c.TipoVariavel);
                                 string variavelMySqlType = "String";
@@ -1781,7 +1781,7 @@ namespace GeradorCamadaCSharp
                                 bool lista = false;
                                 bool join = false;
 
-                                if (CriarSelect(c.Descricao, ref lista, ref join))
+                                if (CriarSelect(c, ref lista, ref join))
                                 {
                                     if (join)
                                         joins.Add(c);
@@ -2274,7 +2274,7 @@ namespace GeradorCamadaCSharp
                                 bool lista = false;
                                 bool join = false;
 
-                                if (CriarSelect(c.Descricao, ref lista, ref join))
+                                if (CriarSelect(c, ref lista, ref join))
                                 {
                                     if (join)
                                     {
@@ -2495,7 +2495,8 @@ namespace GeradorCamadaCSharp
 
                         foreach (TabelaInfo t in tabelas)
                         {
-                            arquivo.WriteLine("        public static " + t.ClasseDao + " get" + t.ClasseDao + "() {");
+                            arquivo.WriteLine("        public static " + t.ClasseDao + " get" + t.ClasseDao + "()");
+                            arquivo.WriteLine("        {");
                             arquivo.WriteLine("            if (" + t.ApelidoDao + " == null)");
                             arquivo.WriteLine("                " + t.ApelidoDao + " = new " + t.ClasseDao + "();");
                             arquivo.WriteLine("            return " + t.ApelidoDao + ";");
@@ -2553,9 +2554,9 @@ namespace GeradorCamadaCSharp
             }
         }
 
-        bool CriarSelect(string coluna, ref bool lista, ref bool join)
+        bool CriarSelect(ColunaInfo c, ref bool lista, ref bool join)
         {
-            coluna = coluna.ToUpper();
+            string coluna = c.DescricaoDB.ToUpper();
             bool ok = true;
 
             if (coluna.Contains("CODIGO") || coluna.Contains("NUMERO") || coluna.Equals("EAN") || coluna.Equals("CPF") || coluna.Equals("CNPJ"))
@@ -2565,7 +2566,7 @@ namespace GeradorCamadaCSharp
             {
                 lista = true;
             }
-            else if (coluna != "ID" && coluna.EndsWith("ID"))
+            else if (!c.ChavePrimaria && (coluna.StartsWith("ID") || coluna.EndsWith("ID")))
             {
                 lista = true;
                 join = true;
