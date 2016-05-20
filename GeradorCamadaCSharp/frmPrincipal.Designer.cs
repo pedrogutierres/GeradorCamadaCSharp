@@ -43,6 +43,8 @@
             this.ordenar = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.novaTabela = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtSiglaInicial = new System.Windows.Forms.TextBox();
             this.chkStringConexao = new System.Windows.Forms.CheckBox();
             this.rdbREST = new System.Windows.Forms.RadioButton();
             this.rdbSOAP = new System.Windows.Forms.RadioButton();
@@ -58,8 +60,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.cmbDatabase = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtSiglaInicial = new System.Windows.Forms.TextBox();
+            this.chkNULLeNotNULL = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabAtualiza.SuspendLayout();
@@ -210,6 +211,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.chkNULLeNotNULL);
             this.groupBox3.Controls.Add(this.label2);
             this.groupBox3.Controls.Add(this.txtSiglaInicial);
             this.groupBox3.Controls.Add(this.chkStringConexao);
@@ -232,6 +234,22 @@
             this.groupBox3.Size = new System.Drawing.Size(344, 317);
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(13, 117);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(60, 13);
+            this.label2.TabIndex = 21;
+            this.label2.Text = "Sigla Inicial";
+            // 
+            // txtSiglaInicial
+            // 
+            this.txtSiglaInicial.Location = new System.Drawing.Point(79, 114);
+            this.txtSiglaInicial.Name = "txtSiglaInicial";
+            this.txtSiglaInicial.Size = new System.Drawing.Size(222, 20);
+            this.txtSiglaInicial.TabIndex = 20;
             // 
             // chkStringConexao
             // 
@@ -281,7 +299,7 @@
             // lblPacoteWebService
             // 
             this.lblPacoteWebService.AutoSize = true;
-            this.lblPacoteWebService.Location = new System.Drawing.Point(7, 181);
+            this.lblPacoteWebService.Location = new System.Drawing.Point(7, 197);
             this.lblPacoteWebService.Name = "lblPacoteWebService";
             this.lblPacoteWebService.Size = new System.Drawing.Size(66, 26);
             this.lblPacoteWebService.TabIndex = 15;
@@ -290,7 +308,7 @@
             // 
             // txtPacoteWebService
             // 
-            this.txtPacoteWebService.Location = new System.Drawing.Point(79, 187);
+            this.txtPacoteWebService.Location = new System.Drawing.Point(79, 203);
             this.txtPacoteWebService.Name = "txtPacoteWebService";
             this.txtPacoteWebService.Size = new System.Drawing.Size(222, 20);
             this.txtPacoteWebService.TabIndex = 14;
@@ -299,7 +317,7 @@
             // chkWebService
             // 
             this.chkWebService.AutoSize = true;
-            this.chkWebService.Location = new System.Drawing.Point(79, 153);
+            this.chkWebService.Location = new System.Drawing.Point(79, 180);
             this.chkWebService.Name = "chkWebService";
             this.chkWebService.Size = new System.Drawing.Size(117, 17);
             this.chkWebService.TabIndex = 13;
@@ -387,21 +405,15 @@
             this.cmbDatabase.Size = new System.Drawing.Size(222, 21);
             this.cmbDatabase.TabIndex = 6;
             // 
-            // label2
+            // chkNULLeNotNULL
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(13, 117);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(60, 13);
-            this.label2.TabIndex = 21;
-            this.label2.Text = "Sigla Inicial";
-            // 
-            // txtSiglaInicial
-            // 
-            this.txtSiglaInicial.Location = new System.Drawing.Point(79, 114);
-            this.txtSiglaInicial.Name = "txtSiglaInicial";
-            this.txtSiglaInicial.Size = new System.Drawing.Size(222, 20);
-            this.txtSiglaInicial.TabIndex = 20;
+            this.chkNULLeNotNULL.AutoSize = true;
+            this.chkNULLeNotNULL.Location = new System.Drawing.Point(79, 140);
+            this.chkNULLeNotNULL.Name = "chkNULLeNotNULL";
+            this.chkNULLeNotNULL.Size = new System.Drawing.Size(167, 17);
+            this.chkNULLeNotNULL.TabIndex = 22;
+            this.chkNULLeNotNULL.Text = "Considerar NULL e Not NULL";
+            this.chkNULLeNotNULL.UseVisualStyleBackColor = true;
             // 
             // frmPrincipal
             // 
@@ -460,6 +472,7 @@
         private System.Windows.Forms.CheckBox chkStringConexao;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtSiglaInicial;
+        private System.Windows.Forms.CheckBox chkNULLeNotNULL;
     }
 }
 
