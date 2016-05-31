@@ -704,7 +704,7 @@ namespace GeradorCamadaCSharp
                                     else
                                         arquivo.WriteLine("                else if (_obj." + c.Descricao + " == null)");
 
-                                    arquivo.WriteLine("                    throw new Exception(string.format(\"Campo {0} não pode ser vazio.\", _obj." + c.Descricao + "));");
+                                    arquivo.WriteLine("                    throw new Exception(string.Format(\"Campo {0} não pode ser vazio.\", _obj." + c.Descricao + "));");
 
                                     primeiraVariavel = false;
                                 }
