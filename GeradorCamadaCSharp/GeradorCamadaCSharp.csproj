@@ -56,7 +56,10 @@
     <Compile Include="frmPrincipal.Designer.cs">
       <DependentUpon>frmPrincipal.cs</DependentUpon>
     </Compile>
-    <Compile Include="Library\ArquivoFuncoes.cs" />
+    <Compile Include="Library\ArquivoEnumeradores.cs" />
+    <Compile Include="Library\ArquivoFuncoesADONetForm.cs" />
+    <Compile Include="Library\ArquivoBaseInfo.cs" />
+    <Compile Include="Library\ArquivoFuncoesWeb.cs" />
     <Compile Include="Util\EnumDescription.cs" />
     <Compile Include="Util\Funcoes.cs" />
     <Compile Include="Program.cs" />

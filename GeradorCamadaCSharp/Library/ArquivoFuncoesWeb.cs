@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace GeradorCamadaCSharp.Library
 {
-    public class ArquivoFuncoes
+    public class ArquivoFuncoesWeb
     {
-        public static string RetornaTextoArquivoFuncoes(string pacote)
+        public static string RetornaTextoArquivo(string pacote)
         {
             StringBuilder funcoes = new StringBuilder();
             funcoes.AppendLine("using MySql.Data.MySqlClient;                                                                                                                                                                                                               ");
