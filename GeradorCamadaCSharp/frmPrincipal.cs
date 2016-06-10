@@ -232,15 +232,28 @@ namespace GeradorCamadaCSharp
                         }
                         else
                         {
-                            if (descricao.EndsWith("_id") || (descricao.StartsWith("id") && !ChavePrimaria))
+                            if (!ChavePrimaria)
                             {
-                                var t = new TabelaInfo();
-                                t.Descricao = descricao.Length > 3 ? descricao.Remove(descricao.Length - 3, 3) : descricao;
+                                if (descricao.EndsWith("_id"))
+                                {
+                                    var t = new TabelaInfo();
+                                    t.Descricao = descricao.Length > 3 ? descricao.Remove(descricao.Length - 3, 3) : descricao;
 
-                                ClasseRelacional = t.Classe;
-                                ClasseRelacionalInfo = t.ClasseInfo;
-                                ClasseRelacionalDao = t.ClasseDao;
-                                ClasseRelacionalApelido = t.ApelidoInfo;
+                                    ClasseRelacional = t.Classe;
+                                    ClasseRelacionalInfo = t.ClasseInfo;
+                                    ClasseRelacionalDao = t.ClasseDao;
+                                    ClasseRelacionalApelido = t.ApelidoInfo;
+                                }
+                                else if (descricao.StartsWith("id"))
+                                {
+                                    var t = new TabelaInfo();
+                                    t.Descricao = descricao.Length > 2 ? descricao.Substring(2) : descricao;
+
+                                    ClasseRelacional = t.Classe;
+                                    ClasseRelacionalInfo = t.ClasseInfo;
+                                    ClasseRelacionalDao = t.ClasseDao;
+                                    ClasseRelacionalApelido = t.ClasseInfo; // ApelidoInfo;
+                                }
                             }
                         }
 
@@ -556,7 +569,7 @@ namespace GeradorCamadaCSharp
                     File.Create(diretorio + "\\ORM\\BaseModel\\" + tabela.ArquivoModel).Close();
                     using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BaseModel\\" + tabela.ArquivoModel))
                     {
-                        bool existeLazyLoading = (tabela.colunas.Find(p => p.Descricao != "id" && p.Descricao.EndsWith("_id")) != null);
+                        bool existeLazyLoading = (tabela.colunas.Find(p => !p.ChavePrimaria && (p.Descricao.ToLower().EndsWith("_id") || p.Descricao.ToLower().StartsWith("id"))) != null);
                         bool existeComment = (tabela.colunas.Find(p => !string.IsNullOrEmpty(p.Comentario)) != null);
 
                         arquivo.WriteLine("using " + pacoteDB + ";");
@@ -722,14 +735,13 @@ namespace GeradorCamadaCSharp
                                 {
                                     if (!c.AceitaNulo)
                                     {
-                                        if ((c.TipoVariavel.Equals(TipoVariavelEnum.String) ||
-                                            c.TipoVariavel.Equals(TipoVariavelEnum.Imagem)) &&
+                                        if (c.TipoVariavel.Equals(TipoVariavelEnum.String) &&
                                             c.DescricaoDB != dataPadraoCriacao)
                                         {
                                             if (primeiraVariavel)
-                                                arquivo.WriteLine("            if (_obj." + c.Descricao + " == null)");
+                                                arquivo.WriteLine("            if (string.IsNullOrEmpty(_obj." + c.Descricao + "))");
                                             else
-                                                arquivo.WriteLine("            else if (_obj." + c.Descricao + " == null)");
+                                                arquivo.WriteLine("            else if (string.IsNullOrEmpty(_obj." + c.Descricao + "))");
 
                                             arquivo.WriteLine("                throw new Exception(string.Format(erroCampoVazio, \"" + c.Descricao + "\"));");
 
@@ -1003,9 +1015,9 @@ namespace GeradorCamadaCSharp
                     File.Create(diretorio + "\\ORM\\BaseDAL\\" + tabela.ArquivoDao).Close();
                     using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BaseDAL\\" + tabela.ArquivoDao))
                     {
+                        bool existeLazyLoading = (tabela.colunas.Find(p => !p.ChavePrimaria && (p.Descricao.ToLower().EndsWith("_id") || p.Descricao.ToLower().StartsWith("id"))) != null);
                         string chavePrimaria = tabela.colunas.Find(p => p.ChavePrimaria).Descricao;
                         string chavePrimariaDB = tabela.colunas.Find(p => p.ChavePrimaria).DescricaoDB;
-                        bool existeLazyLoading = (tabela.colunas.Find(p => p.Descricao != "id" && (p.Descricao.EndsWith("_id") || (p.Descricao != chavePrimaria && p.Descricao.StartsWith("id")))) != null);
 
                         arquivo.WriteLine("using " + pacoteDB + ";");
                         arquivo.WriteLine("using System;");
@@ -1131,7 +1143,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaPorId, parms))");
                         arquivo.WriteLine("            {");
                         arquivo.WriteLine("                if (rdr.Read())");
-                        arquivo.WriteLine("                    return New" + tabela.ClasseInfo + "(rdr, lazyLoading);");
+                        arquivo.WriteLine("                    return New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading);");
                         arquivo.WriteLine("            }");
                         arquivo.WriteLine("            return null;");
                         arquivo.WriteLine("        }");
@@ -1171,7 +1183,7 @@ namespace GeradorCamadaCSharp
                                     arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
                                     arquivo.WriteLine("            {");
                                     arquivo.WriteLine("                if (rdr.Read())");
-                                    arquivo.WriteLine("                    return New" + tabela.ClasseInfo + "(rdr, lazyLoading);");
+                                    arquivo.WriteLine("                    return New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading);");
                                     arquivo.WriteLine("            }");
                                     arquivo.WriteLine("            return null;");
                                     arquivo.WriteLine("        }");
@@ -1188,7 +1200,7 @@ namespace GeradorCamadaCSharp
                                     arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
                                     arquivo.WriteLine("            {");
                                     arquivo.WriteLine("                while (rdr.Read())");
-                                    arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(rdr, lazyLoading));");
+                                    arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading));");
                                     arquivo.WriteLine("            }");
                                     arquivo.WriteLine("            return lst;");
                                     arquivo.WriteLine("        }");
@@ -1239,7 +1251,7 @@ namespace GeradorCamadaCSharp
                             arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaPorParametros, parms))");
                             arquivo.WriteLine("            {");
                             arquivo.WriteLine("                while (rdr.Read())");
-                            arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(rdr, lazyLoading));");
+                            arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading));");
                             arquivo.WriteLine("            }");
                             arquivo.WriteLine("            return lst;");
                             arquivo.WriteLine("        }");
@@ -1252,7 +1264,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaTodos, null))");
                         arquivo.WriteLine("            {");
                         arquivo.WriteLine("                while (rdr.Read())");
-                        arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(rdr, lazyLoading));");
+                        arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading));");
                         arquivo.WriteLine("            }");
                         arquivo.WriteLine("            return lst;");
                         arquivo.WriteLine("        }");
@@ -1294,7 +1306,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("            return parms;");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("        public " + tabela.ClasseInfo + " New" + tabela.ClasseInfo + "(" + dbDataReader + " rdr, bool lazyLoading = false)");
+                        arquivo.WriteLine("        public " + tabela.ClasseInfo + " New" + tabela.ClasseInfo + "(" + stringConexaoParams + "" + dbDataReader + " rdr, bool lazyLoading = false)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            " + tabela.ClasseInfo + " " + tabela.ApelidoInfo + " = new " + tabela.ClasseInfo + "();");
 
@@ -1323,7 +1335,7 @@ namespace GeradorCamadaCSharp
                         {
                             arquivo.WriteLine("");
                             arquivo.WriteLine("            if (lazyLoading)");
-                            arquivo.WriteLine("                LazyLoadingMethod(" + tabela.ApelidoInfo + ");");
+                            arquivo.WriteLine("                LazyLoadingMethod(" + stringConexao + "" + tabela.ApelidoInfo + ");");
                         }
                         arquivo.WriteLine("");
                         arquivo.WriteLine("            return " + tabela.ApelidoInfo + ";");
@@ -1333,7 +1345,7 @@ namespace GeradorCamadaCSharp
                         // Cria método lazy loading
                         if (existeLazyLoading)
                         {
-                            arquivo.WriteLine("        void LazyLoadingMethod(" + tabela.ClasseInfo + " " + tabela.ApelidoInfo + ")");
+                            arquivo.WriteLine("        void LazyLoadingMethod(" + stringConexaoParams + "" + tabela.ClasseInfo + " " + tabela.ApelidoInfo + ")");
                             arquivo.WriteLine("        {");
 
                             foreach (ColunaInfo c in tabela.colunas)
@@ -1341,7 +1353,7 @@ namespace GeradorCamadaCSharp
                                 if (!string.IsNullOrEmpty(c.ClasseRelacionalInfo))
                                 {
                                     arquivo.WriteLine("            if (" + tabela.ApelidoInfo + "." + c.Descricao + " > 0)");
-                                    arquivo.WriteLine("                " + tabela.ApelidoInfo + "." + c.ClasseRelacionalApelido + " = DAOFactory.get" + c.ClasseRelacionalDao + "().RetornaPorId(" + tabela.ApelidoInfo + "." + c.Descricao + ");");
+                                    arquivo.WriteLine("                " + tabela.ApelidoInfo + "." + c.ClasseRelacionalApelido + " = DAOFactory.get" + c.ClasseRelacionalDao + "().RetornaPorId(" + stringConexao + "" + tabela.ApelidoInfo + "." + c.Descricao + ");");
                                     arquivo.WriteLine("");
                                 }
                             }
