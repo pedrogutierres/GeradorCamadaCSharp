@@ -1352,9 +1352,18 @@ namespace GeradorCamadaCSharp
                             {
                                 if (!string.IsNullOrEmpty(c.ClasseRelacionalInfo))
                                 {
-                                    arquivo.WriteLine("            if (" + tabela.ApelidoInfo + "." + c.Descricao + " > 0)");
-                                    arquivo.WriteLine("                " + tabela.ApelidoInfo + "." + c.ClasseRelacionalApelido + " = DAOFactory.get" + c.ClasseRelacionalDao + "().RetornaPorId(" + stringConexao + "" + tabela.ApelidoInfo + "." + c.Descricao + ");");
-                                    arquivo.WriteLine("");
+                                    if (c.AceitaNulo)
+                                    {
+                                        arquivo.WriteLine("            if (" + tabela.ApelidoInfo + "." + c.Descricao + " != null && " + tabela.ApelidoInfo + "." + c.Descricao + " > 0)");
+                                        arquivo.WriteLine("                " + tabela.ApelidoInfo + "." + c.ClasseRelacionalApelido + " = DAOFactory.get" + c.ClasseRelacionalDao + "().RetornaPorId(" + stringConexao + "" + tabela.ApelidoInfo + "." + c.Descricao + " ?? -1);");
+                                        arquivo.WriteLine("");
+                                    }
+                                    else
+                                    {
+                                        arquivo.WriteLine("            if (" + tabela.ApelidoInfo + "." + c.Descricao + " > 0)");
+                                        arquivo.WriteLine("                " + tabela.ApelidoInfo + "." + c.ClasseRelacionalApelido + " = DAOFactory.get" + c.ClasseRelacionalDao + "().RetornaPorId(" + stringConexao + "" + tabela.ApelidoInfo + "." + c.Descricao + ");");
+                                        arquivo.WriteLine("");
+                                    }
                                 }
                             }
 
@@ -2751,28 +2760,28 @@ namespace GeradorCamadaCSharp
         }
         private void btnConfirmarProcesso_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            if (string.IsNullOrEmpty(txtPacote.Text))
+            try
             {
-                Accessor.Funcoes.Aviso("Informar um pacote.");
-                return;
+                if (string.IsNullOrEmpty(txtPacote.Text))
+                {
+                    Accessor.Funcoes.Aviso("Informar um pacote.");
+                    return;
+                }
+
+                ControlaBotoes(false, false, false);
+                CriarArquivos(Application.StartupPath + "\\tempTabelas");
+
+                Accessor.Funcoes.Aviso("Terminou.");
+
+                Process.Start("explorer.exe", Application.StartupPath + "\\" + "tempTabelas\\");
+
+                ControlaBotoes(true, true, true);
             }
-
-            ControlaBotoes(false, false, false);
-            CriarArquivos(Application.StartupPath + "\\tempTabelas");
-
-            Accessor.Funcoes.Aviso("Terminou.");
-
-            Process.Start("explorer.exe", Application.StartupPath + "\\" + "tempTabelas\\");
-
-            ControlaBotoes(true, true, true);
-            //}
-            //catch (Exception ex)
-            //{
-            //    ControlaBotoes(true, false, true);
-            //    Accessor.Funcoes.MensagemDeErro(ex.Message);
-            //}
+            catch (Exception ex)
+            {
+                ControlaBotoes(true, false, true);
+                Accessor.Funcoes.MensagemDeErro(ex.Message);
+            }
         }
         private void btnCancelar_Click(object sender, EventArgs e)
         {
