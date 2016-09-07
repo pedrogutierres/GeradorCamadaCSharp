@@ -777,7 +777,8 @@ namespace GeradorCamadaCSharp
                             {
                                 if (!c.ChavePrimaria)
                                 {
-                                    if (!c.AceitaNulo && c.TipoVariavel.Equals(TipoVariavelEnum.DateTime) && c.DescricaoDB == dataPadraoCriacao)
+                                    //if (!c.AceitaNulo && c.TipoVariavel.Equals(TipoVariavelEnum.DateTime) && c.DescricaoDB == dataPadraoCriacao)
+                                    if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime) && c.DescricaoDB == dataPadraoCriacao)
                                     {
                                         arquivo.WriteLine("            if (_obj." + c.Descricao + " == null)");
                                         arquivo.WriteLine("                _obj." + c.Descricao + " = DateTime.Now;");
