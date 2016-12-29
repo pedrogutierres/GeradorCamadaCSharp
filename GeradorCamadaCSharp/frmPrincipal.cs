@@ -429,23 +429,23 @@ namespace GeradorCamadaCSharp
                 if (!Directory.Exists(diretorio))
                     Directory.CreateDirectory(diretorio);
 
-                if (!Directory.Exists(diretorio + "\\ORM\\BaseModel"))
-                    Directory.CreateDirectory(diretorio + "\\ORM\\BaseModel");
+                if (!Directory.Exists(diretorio + "\\BaseLibrary\\BaseModel"))
+                    Directory.CreateDirectory(diretorio + "\\BaseLibrary\\BaseModel");
 
-                if (!Directory.Exists(diretorio + "\\ORM\\Model"))
-                    Directory.CreateDirectory(diretorio + "\\ORM\\Model");
+                if (!Directory.Exists(diretorio + "\\Library\\Model"))
+                    Directory.CreateDirectory(diretorio + "\\Library\\Model");
 
-                if (!Directory.Exists(diretorio + "\\ORM\\BaseBLL"))
-                    Directory.CreateDirectory(diretorio + "\\ORM\\BaseBLL");
+                if (!Directory.Exists(diretorio + "\\BaseLibrary\\BaseBLL"))
+                    Directory.CreateDirectory(diretorio + "\\BaseLibrary\\BaseBLL");
 
-                if (!Directory.Exists(diretorio + "\\ORM\\BLL"))
-                    Directory.CreateDirectory(diretorio + "\\ORM\\BLL");
+                if (!Directory.Exists(diretorio + "\\Library\\BLL"))
+                    Directory.CreateDirectory(diretorio + "\\Library\\BLL");
 
-                if (!Directory.Exists(diretorio + "\\ORM\\BaseDAL"))
-                    Directory.CreateDirectory(diretorio + "\\ORM\\BaseDAL");
+                if (!Directory.Exists(diretorio + "\\BaseLibrary\\BaseDAL"))
+                    Directory.CreateDirectory(diretorio + "\\BaseLibrary\\BaseDAL");
 
-                if (!Directory.Exists(diretorio + "\\ORM\\DAL"))
-                    Directory.CreateDirectory(diretorio + "\\ORM\\DAL");
+                if (!Directory.Exists(diretorio + "\\Library\\DAL"))
+                    Directory.CreateDirectory(diretorio + "\\Library\\DAL");
 
                 if (!Directory.Exists(diretorio + "\\WebService"))
                     Directory.CreateDirectory(diretorio + "\\WebService");
@@ -520,13 +520,14 @@ namespace GeradorCamadaCSharp
                     StringBuilder _columns = new StringBuilder();
                     List<string> primaryKeys = new List<string>();
 
+                    bool chavePrimariaExiste = false;
                     ColunaInfo coluna = null;
                     using (MySqlDataReader rdr = Accessor.Funcoes.ExecuteReader(CommandType.Text, recoverSelectColumn, parms))
                     {
                         while (rdr.Read())
                         {
                             coluna = new ColunaInfo();
-                            coluna.ChavePrimaria = rdr["column_key"].ToString().ToLower().Contains("pri");
+                            coluna.ChavePrimaria = rdr["column_key"].ToString().ToLower().Contains("pri") && !chavePrimariaExiste;
                             coluna.Descricao = rdr["column_name"].ToString();
                             coluna.Tipo = rdr["column_type"].ToString();
                             coluna.TamanhoMaximoTexto = Accessor.Funcoes.ConvertToInt32(rdr["character_maximum_length"].ToString());
@@ -538,8 +539,11 @@ namespace GeradorCamadaCSharp
 
                             tabela.colunas.Add(coluna);
 
-                            if (rdr["column_key"].ToString().ToLower().Contains("pri"))
+                            if (rdr["column_key"].ToString().ToLower().Contains("pri") && !chavePrimariaExiste)
+                            {
                                 primaryKeys.Add(rdr["column_name"].ToString());
+                                chavePrimariaExiste = true;
+                            }
                         }
                     }
 
@@ -566,8 +570,8 @@ namespace GeradorCamadaCSharp
                     }
 
                     #region CriaArquivo Base Model
-                    File.Create(diretorio + "\\ORM\\BaseModel\\" + tabela.ArquivoModel).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BaseModel\\" + tabela.ArquivoModel))
+                    File.Create(diretorio + "\\BaseLibrary\\BaseModel\\" + tabela.ArquivoModel).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\BaseLibrary\\BaseModel\\" + tabela.ArquivoModel))
                     {
                         bool existeLazyLoading = (tabela.colunas.Find(p => !p.ChavePrimaria && (p.Descricao.ToLower().EndsWith("_id") || p.Descricao.ToLower().StartsWith("id"))) != null);
                         bool existeComment = (tabela.colunas.Find(p => !string.IsNullOrEmpty(p.Comentario)) != null);
@@ -663,8 +667,8 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo Model
-                    File.Create(diretorio + "\\ORM\\Model\\" + tabela.ArquivoModel).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\Model\\" + tabela.ArquivoModel))
+                    File.Create(diretorio + "\\Library\\Model\\" + tabela.ArquivoModel).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\Library\\Model\\" + tabela.ArquivoModel))
                     {
                         bool existeComment = (tabela.colunas.Find(p => !string.IsNullOrEmpty(p.Comentario)) != null);
 
@@ -691,8 +695,8 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo Base BLL
-                    File.Create(diretorio + "\\ORM\\BaseBLL\\Base" + tabela.ArquivoBo).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BaseBLL\\Base" + tabela.ArquivoBo))
+                    File.Create(diretorio + "\\BaseLibrary\\BaseBLL\\Base" + tabela.ArquivoBo).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\BaseLibrary\\BaseBLL\\Base" + tabela.ArquivoBo))
                     {
                         arquivo.WriteLine("using " + pacoteDB + ";");
                         arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
@@ -932,6 +936,39 @@ namespace GeradorCamadaCSharp
                             }
                         }
 
+                        List<ColunaInfo> datas = new List<ColunaInfo>();
+                        foreach (ColunaInfo c in tabela.colunas)
+                        {
+                            string coluna2 = c.DescricaoDB.ToUpper();
+
+                            if (TipoVariavelEnum.DateTime.Equals(c.TipoVariavel))
+                            {
+                                if (coluna2.Contains("DATA") && !coluna2.Contains(dataPadraoCriacao.ToUpper()))
+                                    datas.Add(c);
+                            }
+                        }
+
+                        if (datas.Count > 0)
+                        {
+                            foreach (ColunaInfo c in datas)
+                            {
+                                string pesquisaPor = "Por" + c.Descricao;
+
+                                arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + stringConexaoParams + "DateTime dataInicial, DateTime dataFinal" + parametroLazyLoading + ")");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            try");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                return " + tabela.ApelidoDao + ".Retorna" + pesquisaPor + "(" + stringConexao + "dataInicial, dataFinal" + variavelLazyLoading + ");");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            catch");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                throw;");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
+                            }
+                        }
+
                         if (joins.Count > 1)
                         {
                             StringBuilder parametros = new StringBuilder();
@@ -980,8 +1017,8 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo BLL
-                    File.Create(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BLL\\" + tabela.ArquivoBo))
+                    File.Create(diretorio + "\\Library\\BLL\\" + tabela.ArquivoBo).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\Library\\BLL\\" + tabela.ArquivoBo))
                     {
                         arquivo.WriteLine("using " + pacoteDB + ";");
                         arquivo.WriteLine("using " + pacoteORM + ".Library.BaseBLL;");
@@ -1013,8 +1050,8 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo Base DAL
-                    File.Create(diretorio + "\\ORM\\BaseDAL\\" + tabela.ArquivoDao).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\BaseDAL\\" + tabela.ArquivoDao))
+                    File.Create(diretorio + "\\BaseLibrary\\BaseDAL\\" + tabela.ArquivoDao).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\BaseLibrary\\BaseDAL\\" + tabela.ArquivoDao))
                     {
                         bool existeLazyLoading = (tabela.colunas.Find(p => !p.ChavePrimaria && (p.Descricao.ToLower().EndsWith("_id") || p.Descricao.ToLower().StartsWith("id"))) != null);
                         string chavePrimaria = tabela.colunas.Find(p => p.ChavePrimaria).Descricao;
@@ -1059,6 +1096,24 @@ namespace GeradorCamadaCSharp
                             }
                         }
 
+                        List<ColunaInfo> datas = new List<ColunaInfo>();
+                        foreach (ColunaInfo c in tabela.colunas)
+                        {
+                            string coluna2 = c.DescricaoDB.ToUpper();
+
+                            if (TipoVariavelEnum.DateTime.Equals(c.TipoVariavel))
+                            {
+                                if (coluna2.Contains("DATA") && !coluna2.Contains(dataPadraoCriacao.ToUpper()))
+                                    datas.Add(c);
+                            }
+                        }
+
+                        if (datas.Count > 0)
+                        {
+                            arquivo.WriteLine("        const string paramPDataInicial = \"?pDataInicial\";");
+                            arquivo.WriteLine("        const string paramPDataFinal = \"?pDataFinal\";");
+                        }
+
                         if (colunas.Length > 0)
                             colunas.Remove(colunas.Length - 1, 1);
                         if (colunasParametros.Length > 0)
@@ -1096,6 +1151,16 @@ namespace GeradorCamadaCSharp
                             }
                         }
 
+                        if (datas.Count > 0)
+                        {
+                            foreach (ColunaInfo c in datas)
+                            {
+                                string pesquisaPor = "Por" + c.Descricao;
+
+                                arquivo.WriteLine("        const string cmdRetorna" + pesquisaPor + " = \"select * from " + tabela.Descricao + " where " + c.DescricaoDB + " between ?pDataInicial and ?pDataFinal \";");
+                            }
+                        }
+
                         if (joins.Count > 1)
                         {
                             StringBuilder parametros = new StringBuilder();
@@ -1105,7 +1170,6 @@ namespace GeradorCamadaCSharp
 
                             arquivo.WriteLine("        const string cmdRetornaPorParametros = \"select * from " + tabela.Descricao + " where " + parametros.Remove(parametros.Length - 5, 5) + "\";");
                         }
-
 
                         arquivo.WriteLine("        const string cmdRetornaTodos = \"select * from " + tabela.Descricao + ";\";");
                         arquivo.WriteLine("        #endregion");
@@ -1207,6 +1271,30 @@ namespace GeradorCamadaCSharp
                                     arquivo.WriteLine("        }");
                                     arquivo.WriteLine("");
                                 }
+                            }
+                        }
+
+                        if (datas.Count > 0)
+                        {
+                            foreach (ColunaInfo c in datas)
+                            {
+                                string pesquisaPor = "Por" + c.Descricao;
+
+                                arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + stringConexaoParams + "DateTime dataInicial, DateTime dataFinal, bool lazyLoading = false)");
+                                arquivo.WriteLine("        {");
+                                arquivo.WriteLine("            " + dbParameter + "[] parms = new " + dbParameter + "[2];");
+                                arquivo.WriteLine("            parms[0] = mFuncoes.CreateParameter(paramPDataInicial, " + dbType + ".DateTime, dataInicial);");
+                                arquivo.WriteLine("            parms[1] = mFuncoes.CreateParameter(paramPDataFinal, " + dbType + ".DateTime, dataFinal);");
+                                arquivo.WriteLine("");
+                                arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> lst = new List<" + tabela.ClasseInfo + ">();");
+                                arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
+                                arquivo.WriteLine("            {");
+                                arquivo.WriteLine("                while (rdr.Read())");
+                                arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading));");
+                                arquivo.WriteLine("            }");
+                                arquivo.WriteLine("            return lst;");
+                                arquivo.WriteLine("        }");
+                                arquivo.WriteLine("");
                             }
                         }
 
@@ -1380,8 +1468,8 @@ namespace GeradorCamadaCSharp
                     #endregion
 
                     #region CriaArquivo DAL
-                    File.Create(diretorio + "\\ORM\\DAL\\" + tabela.ArquivoDao).Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\DAL\\" + tabela.ArquivoDao))
+                    File.Create(diretorio + "\\Library\\DAL\\" + tabela.ArquivoDao).Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\Library\\DAL\\" + tabela.ArquivoDao))
                     {
                         arquivo.WriteLine("using " + pacoteDB + ";");
                         arquivo.WriteLine("using System;");
@@ -2647,8 +2735,8 @@ namespace GeradorCamadaCSharp
                 if (tabelas.Count > 0)
                 {
                     #region CriaArquivo DAOFactory
-                    File.Create(diretorio + "\\ORM\\DAL\\DAOFactory.cs").Close();
-                    using (TextWriter arquivo = File.AppendText(diretorio + "\\ORM\\DAL\\DAOFactory.cs"))
+                    File.Create(diretorio + "\\Library\\DAL\\DAOFactory.cs").Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\Library\\DAL\\DAOFactory.cs"))
                     {
                         arquivo.WriteLine("namespace " + pacoteORM + ".Library.DAL");
                         arquivo.WriteLine("{");
@@ -2728,17 +2816,22 @@ namespace GeradorCamadaCSharp
             string coluna = c.DescricaoDB.ToUpper();
             bool ok = true;
 
-            if (coluna.Contains("CODIGO") || coluna.Contains("NUMERO") || coluna.Equals("EAN") || coluna.Equals("CPF") || coluna.Equals("CNPJ"))
-            { }
-            else if (coluna.Contains("DESCRICAO") || coluna.Contains("NOME") || coluna.Contains("RAZAO") || coluna.Contains("FANTASIA")
-                || coluna.Equals("LOJA") || coluna.Equals("IDLOJA") || coluna.Equals("ID_LOJA"))
+            if (!c.ChavePrimaria)
             {
-                lista = true;
-            }
-            else if (!c.ChavePrimaria && (coluna.StartsWith("ID") || coluna.EndsWith("ID")))
-            {
-                lista = true;
-                join = true;
+                if (coluna.Contains("CODIGO") || coluna.Contains("NUMERO") || coluna.Equals("EAN") || coluna.Equals("CPF") || coluna.Equals("CNPJ"))
+                { }
+                else if (coluna.Contains("DESCRICAO") || coluna.Contains("NOME") || coluna.Contains("RAZAO") || coluna.Contains("FANTASIA")
+                    || coluna.Equals("LOJA") || coluna.Equals("IDLOJA") || coluna.Equals("ID_LOJA"))
+                {
+                    lista = true;
+                }
+                else if (!c.ChavePrimaria && (coluna.StartsWith("ID") || coluna.EndsWith("ID")))
+                {
+                    lista = true;
+                    join = true;
+                }
+                else
+                    ok = false;
             }
             else
                 ok = false;

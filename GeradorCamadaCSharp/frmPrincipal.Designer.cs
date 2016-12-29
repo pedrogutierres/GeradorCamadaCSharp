@@ -43,6 +43,9 @@
             this.ordenar = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.novaTabela = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.groupBox7 = new System.Windows.Forms.GroupBox();
+            this.rdbMySQL = new System.Windows.Forms.RadioButton();
+            this.rdbADO_Net = new System.Windows.Forms.RadioButton();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.rdbFuncoesWebService = new System.Windows.Forms.RadioButton();
             this.rdbFuncoesForm = new System.Windows.Forms.RadioButton();
@@ -65,9 +68,6 @@
             this.label4 = new System.Windows.Forms.Label();
             this.cmbDatabase = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.groupBox7 = new System.Windows.Forms.GroupBox();
-            this.rdbMySQL = new System.Windows.Forms.RadioButton();
-            this.rdbADO_Net = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabAtualiza.SuspendLayout();
@@ -75,9 +75,9 @@
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgTabelasAlteradas)).BeginInit();
             this.groupBox3.SuspendLayout();
+            this.groupBox7.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.groupBox5.SuspendLayout();
-            this.groupBox7.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -101,7 +101,7 @@
             this.btnFechar.Location = new System.Drawing.Point(657, 9);
             this.btnFechar.Name = "btnFechar";
             this.btnFechar.Size = new System.Drawing.Size(35, 35);
-            this.btnFechar.TabIndex = 2;
+            this.btnFechar.TabIndex = 0;
             this.toolTip1.SetToolTip(this.btnFechar, "Sair");
             this.btnFechar.UseVisualStyleBackColor = true;
             this.btnFechar.Click += new System.EventHandler(this.btnSair_Click);
@@ -113,7 +113,7 @@
             this.groupBox2.Location = new System.Drawing.Point(0, 50);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(698, 436);
-            this.groupBox2.TabIndex = 4;
+            this.groupBox2.TabIndex = 0;
             this.groupBox2.TabStop = false;
             // 
             // tabAtualiza
@@ -246,6 +246,39 @@
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             // 
+            // groupBox7
+            // 
+            this.groupBox7.Controls.Add(this.rdbMySQL);
+            this.groupBox7.Controls.Add(this.rdbADO_Net);
+            this.groupBox7.Location = new System.Drawing.Point(202, 163);
+            this.groupBox7.Name = "groupBox7";
+            this.groupBox7.Size = new System.Drawing.Size(117, 66);
+            this.groupBox7.TabIndex = 10;
+            this.groupBox7.TabStop = false;
+            this.groupBox7.Text = "Banco de Dados ?";
+            // 
+            // rdbMySQL
+            // 
+            this.rdbMySQL.AutoSize = true;
+            this.rdbMySQL.Checked = true;
+            this.rdbMySQL.Location = new System.Drawing.Point(10, 19);
+            this.rdbMySQL.Name = "rdbMySQL";
+            this.rdbMySQL.Size = new System.Drawing.Size(60, 17);
+            this.rdbMySQL.TabIndex = 0;
+            this.rdbMySQL.TabStop = true;
+            this.rdbMySQL.Text = "MySQL";
+            this.rdbMySQL.UseVisualStyleBackColor = true;
+            // 
+            // rdbADO_Net
+            // 
+            this.rdbADO_Net.AutoSize = true;
+            this.rdbADO_Net.Location = new System.Drawing.Point(10, 42);
+            this.rdbADO_Net.Name = "rdbADO_Net";
+            this.rdbADO_Net.Size = new System.Drawing.Size(73, 17);
+            this.rdbADO_Net.TabIndex = 1;
+            this.rdbADO_Net.Text = "ADO.NET";
+            this.rdbADO_Net.UseVisualStyleBackColor = true;
+            // 
             // groupBox6
             // 
             this.groupBox6.Controls.Add(this.rdbFuncoesWebService);
@@ -253,7 +286,7 @@
             this.groupBox6.Location = new System.Drawing.Point(79, 163);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(117, 66);
-            this.groupBox6.TabIndex = 24;
+            this.groupBox6.TabIndex = 9;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Funções ?";
             // 
@@ -264,7 +297,7 @@
             this.rdbFuncoesWebService.Location = new System.Drawing.Point(10, 19);
             this.rdbFuncoesWebService.Name = "rdbFuncoesWebService";
             this.rdbFuncoesWebService.Size = new System.Drawing.Size(87, 17);
-            this.rdbFuncoesWebService.TabIndex = 18;
+            this.rdbFuncoesWebService.TabIndex = 0;
             this.rdbFuncoesWebService.TabStop = true;
             this.rdbFuncoesWebService.Text = "Web Service";
             this.rdbFuncoesWebService.UseVisualStyleBackColor = true;
@@ -275,7 +308,7 @@
             this.rdbFuncoesForm.Location = new System.Drawing.Point(10, 42);
             this.rdbFuncoesForm.Name = "rdbFuncoesForm";
             this.rdbFuncoesForm.Size = new System.Drawing.Size(48, 17);
-            this.rdbFuncoesForm.TabIndex = 17;
+            this.rdbFuncoesForm.TabIndex = 1;
             this.rdbFuncoesForm.Text = "Form";
             this.rdbFuncoesForm.UseVisualStyleBackColor = true;
             // 
@@ -286,7 +319,7 @@
             this.groupBox5.Location = new System.Drawing.Point(79, 317);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(118, 60);
-            this.groupBox5.TabIndex = 23;
+            this.groupBox5.TabIndex = 15;
             this.groupBox5.TabStop = false;
             // 
             // rdbREST
@@ -296,7 +329,7 @@
             this.rdbREST.Location = new System.Drawing.Point(33, 13);
             this.rdbREST.Name = "rdbREST";
             this.rdbREST.Size = new System.Drawing.Size(54, 17);
-            this.rdbREST.TabIndex = 18;
+            this.rdbREST.TabIndex = 0;
             this.rdbREST.TabStop = true;
             this.rdbREST.Text = "REST";
             this.rdbREST.UseVisualStyleBackColor = true;
@@ -308,7 +341,7 @@
             this.rdbSOAP.Location = new System.Drawing.Point(33, 36);
             this.rdbSOAP.Name = "rdbSOAP";
             this.rdbSOAP.Size = new System.Drawing.Size(54, 17);
-            this.rdbSOAP.TabIndex = 17;
+            this.rdbSOAP.TabIndex = 1;
             this.rdbSOAP.Text = "SOAP";
             this.rdbSOAP.UseVisualStyleBackColor = true;
             this.rdbSOAP.Visible = false;
@@ -319,7 +352,7 @@
             this.chkValidacoesColuna.Location = new System.Drawing.Point(79, 140);
             this.chkValidacoesColuna.Name = "chkValidacoesColuna";
             this.chkValidacoesColuna.Size = new System.Drawing.Size(262, 17);
-            this.chkValidacoesColuna.TabIndex = 22;
+            this.chkValidacoesColuna.TabIndex = 8;
             this.chkValidacoesColuna.Text = "Considerar NULL / Not NULL / Tamanho Varchar";
             this.chkValidacoesColuna.UseVisualStyleBackColor = true;
             // 
@@ -329,7 +362,7 @@
             this.label2.Location = new System.Drawing.Point(13, 117);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(60, 13);
-            this.label2.TabIndex = 21;
+            this.label2.TabIndex = 6;
             this.label2.Text = "Sigla Inicial";
             // 
             // txtSiglaInicial
@@ -337,7 +370,7 @@
             this.txtSiglaInicial.Location = new System.Drawing.Point(79, 114);
             this.txtSiglaInicial.Name = "txtSiglaInicial";
             this.txtSiglaInicial.Size = new System.Drawing.Size(222, 20);
-            this.txtSiglaInicial.TabIndex = 20;
+            this.txtSiglaInicial.TabIndex = 7;
             // 
             // chkStringConexao
             // 
@@ -345,7 +378,7 @@
             this.chkStringConexao.Location = new System.Drawing.Point(79, 57);
             this.chkStringConexao.Name = "chkStringConexao";
             this.chkStringConexao.Size = new System.Drawing.Size(179, 17);
-            this.chkStringConexao.TabIndex = 19;
+            this.chkStringConexao.TabIndex = 3;
             this.chkStringConexao.Text = "Deve informar stirng de conexão";
             this.chkStringConexao.UseVisualStyleBackColor = true;
             // 
@@ -355,7 +388,7 @@
             this.chkComunicadorSemNewInstance.Location = new System.Drawing.Point(79, 297);
             this.chkComunicadorSemNewInstance.Name = "chkComunicadorSemNewInstance";
             this.chkComunicadorSemNewInstance.Size = new System.Drawing.Size(174, 17);
-            this.chkComunicadorSemNewInstance.TabIndex = 16;
+            this.chkComunicadorSemNewInstance.TabIndex = 14;
             this.chkComunicadorSemNewInstance.Text = "Comunicador sem newInstance";
             this.chkComunicadorSemNewInstance.UseVisualStyleBackColor = true;
             this.chkComunicadorSemNewInstance.Visible = false;
@@ -366,7 +399,7 @@
             this.lblPacoteWebService.Location = new System.Drawing.Point(7, 265);
             this.lblPacoteWebService.Name = "lblPacoteWebService";
             this.lblPacoteWebService.Size = new System.Drawing.Size(66, 26);
-            this.lblPacoteWebService.TabIndex = 15;
+            this.lblPacoteWebService.TabIndex = 12;
             this.lblPacoteWebService.Text = "Pacote\r\nWebService";
             this.lblPacoteWebService.Visible = false;
             // 
@@ -375,7 +408,7 @@
             this.txtPacoteWebService.Location = new System.Drawing.Point(79, 271);
             this.txtPacoteWebService.Name = "txtPacoteWebService";
             this.txtPacoteWebService.Size = new System.Drawing.Size(222, 20);
-            this.txtPacoteWebService.TabIndex = 14;
+            this.txtPacoteWebService.TabIndex = 13;
             this.txtPacoteWebService.Visible = false;
             // 
             // chkWebService
@@ -384,7 +417,7 @@
             this.chkWebService.Location = new System.Drawing.Point(79, 248);
             this.chkWebService.Name = "chkWebService";
             this.chkWebService.Size = new System.Drawing.Size(117, 17);
-            this.chkWebService.TabIndex = 13;
+            this.chkWebService.TabIndex = 11;
             this.chkWebService.Text = "Gerar Web Service";
             this.chkWebService.UseVisualStyleBackColor = true;
             this.chkWebService.CheckedChanged += new System.EventHandler(this.chkWebService_CheckedChanged);
@@ -395,7 +428,7 @@
             this.label1.Location = new System.Drawing.Point(32, 91);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(41, 13);
-            this.label1.TabIndex = 12;
+            this.label1.TabIndex = 4;
             this.label1.Text = "Pacote";
             // 
             // txtPacote
@@ -403,7 +436,7 @@
             this.txtPacote.Location = new System.Drawing.Point(79, 88);
             this.txtPacote.Name = "txtPacote";
             this.txtPacote.Size = new System.Drawing.Size(222, 20);
-            this.txtPacote.TabIndex = 11;
+            this.txtPacote.TabIndex = 5;
             // 
             // btnCancelar
             // 
@@ -416,7 +449,7 @@
             this.btnCancelar.Location = new System.Drawing.Point(297, 344);
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new System.Drawing.Size(35, 35);
-            this.btnCancelar.TabIndex = 10;
+            this.btnCancelar.TabIndex = 17;
             this.toolTip1.SetToolTip(this.btnCancelar, "Cancelar");
             this.btnCancelar.UseVisualStyleBackColor = true;
             this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
@@ -432,7 +465,7 @@
             this.btnConfirmarProcesso.Location = new System.Drawing.Point(256, 344);
             this.btnConfirmarProcesso.Name = "btnConfirmarProcesso";
             this.btnConfirmarProcesso.Size = new System.Drawing.Size(35, 35);
-            this.btnConfirmarProcesso.TabIndex = 9;
+            this.btnConfirmarProcesso.TabIndex = 16;
             this.toolTip1.SetToolTip(this.btnConfirmarProcesso, "Processar");
             this.btnConfirmarProcesso.UseVisualStyleBackColor = true;
             this.btnConfirmarProcesso.Click += new System.EventHandler(this.btnConfirmarProcesso_Click);
@@ -446,7 +479,7 @@
             this.btnAtualizaDatabases.Location = new System.Drawing.Point(307, 25);
             this.btnAtualizaDatabases.Name = "btnAtualizaDatabases";
             this.btnAtualizaDatabases.Size = new System.Drawing.Size(25, 25);
-            this.btnAtualizaDatabases.TabIndex = 8;
+            this.btnAtualizaDatabases.TabIndex = 0;
             this.toolTip1.SetToolTip(this.btnAtualizaDatabases, "Atualizar banco de dados");
             this.btnAtualizaDatabases.UseVisualStyleBackColor = true;
             this.btnAtualizaDatabases.Click += new System.EventHandler(this.btnAtualizaDatabases_Click);
@@ -457,7 +490,7 @@
             this.label4.Location = new System.Drawing.Point(20, 32);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(53, 13);
-            this.label4.TabIndex = 7;
+            this.label4.TabIndex = 1;
             this.label4.Text = "Database";
             // 
             // cmbDatabase
@@ -467,40 +500,7 @@
             this.cmbDatabase.Location = new System.Drawing.Point(79, 29);
             this.cmbDatabase.Name = "cmbDatabase";
             this.cmbDatabase.Size = new System.Drawing.Size(222, 21);
-            this.cmbDatabase.TabIndex = 6;
-            // 
-            // groupBox7
-            // 
-            this.groupBox7.Controls.Add(this.rdbMySQL);
-            this.groupBox7.Controls.Add(this.rdbADO_Net);
-            this.groupBox7.Location = new System.Drawing.Point(202, 163);
-            this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(117, 66);
-            this.groupBox7.TabIndex = 25;
-            this.groupBox7.TabStop = false;
-            this.groupBox7.Text = "Banco de Dados ?";
-            // 
-            // rdbMySQL
-            // 
-            this.rdbMySQL.AutoSize = true;
-            this.rdbMySQL.Checked = true;
-            this.rdbMySQL.Location = new System.Drawing.Point(10, 19);
-            this.rdbMySQL.Name = "rdbMySQL";
-            this.rdbMySQL.Size = new System.Drawing.Size(60, 17);
-            this.rdbMySQL.TabIndex = 18;
-            this.rdbMySQL.TabStop = true;
-            this.rdbMySQL.Text = "MySQL";
-            this.rdbMySQL.UseVisualStyleBackColor = true;
-            // 
-            // rdbADO_Net
-            // 
-            this.rdbADO_Net.AutoSize = true;
-            this.rdbADO_Net.Location = new System.Drawing.Point(10, 42);
-            this.rdbADO_Net.Name = "rdbADO_Net";
-            this.rdbADO_Net.Size = new System.Drawing.Size(73, 17);
-            this.rdbADO_Net.TabIndex = 17;
-            this.rdbADO_Net.Text = "ADO.NET";
-            this.rdbADO_Net.UseVisualStyleBackColor = true;
+            this.cmbDatabase.TabIndex = 2;
             // 
             // frmPrincipal
             // 
@@ -522,12 +522,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgTabelasAlteradas)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox7.ResumeLayout(false);
+            this.groupBox7.PerformLayout();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
-            this.groupBox7.ResumeLayout(false);
-            this.groupBox7.PerformLayout();
             this.ResumeLayout(false);
 
         }
