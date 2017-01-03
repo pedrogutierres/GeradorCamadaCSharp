@@ -68,6 +68,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.cmbDatabase = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.chkConsiderarRelacionamentos = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabAtualiza.SuspendLayout();
@@ -221,6 +222,7 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.chkConsiderarRelacionamentos);
             this.groupBox3.Controls.Add(this.groupBox7);
             this.groupBox3.Controls.Add(this.groupBox6);
             this.groupBox3.Controls.Add(this.groupBox5);
@@ -250,7 +252,7 @@
             // 
             this.groupBox7.Controls.Add(this.rdbMySQL);
             this.groupBox7.Controls.Add(this.rdbADO_Net);
-            this.groupBox7.Location = new System.Drawing.Point(202, 163);
+            this.groupBox7.Location = new System.Drawing.Point(202, 170);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(117, 66);
             this.groupBox7.TabIndex = 10;
@@ -283,7 +285,7 @@
             // 
             this.groupBox6.Controls.Add(this.rdbFuncoesWebService);
             this.groupBox6.Controls.Add(this.rdbFuncoesForm);
-            this.groupBox6.Location = new System.Drawing.Point(79, 163);
+            this.groupBox6.Location = new System.Drawing.Point(79, 170);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(117, 66);
             this.groupBox6.TabIndex = 9;
@@ -349,7 +351,7 @@
             // chkValidacoesColuna
             // 
             this.chkValidacoesColuna.AutoSize = true;
-            this.chkValidacoesColuna.Location = new System.Drawing.Point(79, 140);
+            this.chkValidacoesColuna.Location = new System.Drawing.Point(79, 127);
             this.chkValidacoesColuna.Name = "chkValidacoesColuna";
             this.chkValidacoesColuna.Size = new System.Drawing.Size(262, 17);
             this.chkValidacoesColuna.TabIndex = 8;
@@ -359,7 +361,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(13, 117);
+            this.label2.Location = new System.Drawing.Point(13, 104);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(60, 13);
             this.label2.TabIndex = 6;
@@ -367,7 +369,7 @@
             // 
             // txtSiglaInicial
             // 
-            this.txtSiglaInicial.Location = new System.Drawing.Point(79, 114);
+            this.txtSiglaInicial.Location = new System.Drawing.Point(79, 101);
             this.txtSiglaInicial.Name = "txtSiglaInicial";
             this.txtSiglaInicial.Size = new System.Drawing.Size(222, 20);
             this.txtSiglaInicial.TabIndex = 7;
@@ -375,7 +377,7 @@
             // chkStringConexao
             // 
             this.chkStringConexao.AutoSize = true;
-            this.chkStringConexao.Location = new System.Drawing.Point(79, 57);
+            this.chkStringConexao.Location = new System.Drawing.Point(79, 44);
             this.chkStringConexao.Name = "chkStringConexao";
             this.chkStringConexao.Size = new System.Drawing.Size(179, 17);
             this.chkStringConexao.TabIndex = 3;
@@ -425,7 +427,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(32, 91);
+            this.label1.Location = new System.Drawing.Point(32, 78);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(41, 13);
             this.label1.TabIndex = 4;
@@ -433,7 +435,7 @@
             // 
             // txtPacote
             // 
-            this.txtPacote.Location = new System.Drawing.Point(79, 88);
+            this.txtPacote.Location = new System.Drawing.Point(79, 75);
             this.txtPacote.Name = "txtPacote";
             this.txtPacote.Size = new System.Drawing.Size(222, 20);
             this.txtPacote.TabIndex = 5;
@@ -476,7 +478,7 @@
             this.btnAtualizaDatabases.FlatAppearance.BorderSize = 0;
             this.btnAtualizaDatabases.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAtualizaDatabases.Image = global::GeradorCamadaCSharp.Properties.Resources.Command_Refresh_24;
-            this.btnAtualizaDatabases.Location = new System.Drawing.Point(307, 25);
+            this.btnAtualizaDatabases.Location = new System.Drawing.Point(307, 12);
             this.btnAtualizaDatabases.Name = "btnAtualizaDatabases";
             this.btnAtualizaDatabases.Size = new System.Drawing.Size(25, 25);
             this.btnAtualizaDatabases.TabIndex = 0;
@@ -487,7 +489,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(20, 32);
+            this.label4.Location = new System.Drawing.Point(20, 19);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(53, 13);
             this.label4.TabIndex = 1;
@@ -497,10 +499,22 @@
             // 
             this.cmbDatabase.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbDatabase.FormattingEnabled = true;
-            this.cmbDatabase.Location = new System.Drawing.Point(79, 29);
+            this.cmbDatabase.Location = new System.Drawing.Point(79, 16);
             this.cmbDatabase.Name = "cmbDatabase";
             this.cmbDatabase.Size = new System.Drawing.Size(222, 21);
             this.cmbDatabase.TabIndex = 2;
+            // 
+            // chkConsiderarRelacionamentos
+            // 
+            this.chkConsiderarRelacionamentos.AutoSize = true;
+            this.chkConsiderarRelacionamentos.Checked = true;
+            this.chkConsiderarRelacionamentos.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkConsiderarRelacionamentos.Location = new System.Drawing.Point(79, 147);
+            this.chkConsiderarRelacionamentos.Name = "chkConsiderarRelacionamentos";
+            this.chkConsiderarRelacionamentos.Size = new System.Drawing.Size(161, 17);
+            this.chkConsiderarRelacionamentos.TabIndex = 18;
+            this.chkConsiderarRelacionamentos.Text = "Considerar Relacionamentos";
+            this.chkConsiderarRelacionamentos.UseVisualStyleBackColor = true;
             // 
             // frmPrincipal
             // 
@@ -573,6 +587,7 @@
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.RadioButton rdbMySQL;
         private System.Windows.Forms.RadioButton rdbADO_Net;
+        private System.Windows.Forms.CheckBox chkConsiderarRelacionamentos;
     }
 }
 

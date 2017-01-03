@@ -612,7 +612,7 @@ namespace GeradorCamadaCSharp
                         }
 
                         // Cria variaveis de classes relacionais
-                        if (existeLazyLoading)
+                        if (existeLazyLoading && chkConsiderarRelacionamentos.Checked)
                         {
                             arquivo.WriteLine("");
                             foreach (ColunaInfo c in tabela.colunas)
@@ -643,7 +643,7 @@ namespace GeradorCamadaCSharp
                         }
 
                         // Cria variaveis de classes relacionais no construtor da classe
-                        if (existeLazyLoading)
+                        if (existeLazyLoading && chkConsiderarRelacionamentos.Checked)
                         {
                             foreach (ColunaInfo c in tabela.colunas)
                             {
@@ -1083,10 +1083,13 @@ namespace GeradorCamadaCSharp
                         StringBuilder colunas = new StringBuilder();
                         StringBuilder colunasParametros = new StringBuilder();
                         StringBuilder colunasUpdate = new StringBuilder();
+                        StringBuilder colunasJoin = new StringBuilder();
 
                         foreach (ColunaInfo c in tabela.colunas)
                         {
                             arquivo.WriteLine("        const string param" + c.Descricao + " = \"?" + c.DescricaoDB + "\";");
+
+                            colunasJoin.Append(tabela.Descricao).Append(".").Append(c.DescricaoDB).Append(" as ").Append(tabela.Descricao).Append("_").Append(c.DescricaoDB).Append(",");
 
                             if (!c.ChavePrimaria)
                             {
@@ -1120,6 +1123,8 @@ namespace GeradorCamadaCSharp
                             colunasParametros.Remove(colunasParametros.Length - 1, 1);
                         if (colunasUpdate.Length > 0)
                             colunasUpdate.Remove(colunasUpdate.Length - 1, 1);
+                        if (colunasJoin.Length > 0)
+                            colunasJoin.Remove(colunasJoin.Length - 1, 1);
 
                         arquivo.WriteLine("        #endregion");
                         arquivo.WriteLine("");
@@ -1127,6 +1132,8 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("        const string colunas = \"" + colunas + "\";");
                         arquivo.WriteLine("        const string colunasParametros = \"" + colunasParametros + "\";");
                         arquivo.WriteLine("        const string colunasUpdate = \"" + colunasUpdate + "\";");
+                        arquivo.WriteLine("");
+                        arquivo.WriteLine("        public static readonly string colunasJoin = \"" + colunasJoin + "\";");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("        const string cmdInserir = \"insert into " + tabela.Descricao + " (\" + colunas + \") values (\" + colunasParametros + \");\";");
                         arquivo.WriteLine("        const string cmdAlterar = \"update " + tabela.Descricao + " set \" + colunasUpdate + \" where " + chavePrimariaDB + "=?" + chavePrimariaDB + "\";");
@@ -1395,7 +1402,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("            return parms;");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("        public " + tabela.ClasseInfo + " New" + tabela.ClasseInfo + "(" + stringConexaoParams + "" + dbDataReader + " rdr, bool lazyLoading = false)");
+                        arquivo.WriteLine("        public static " + tabela.ClasseInfo + " New" + tabela.ClasseInfo + "(" + stringConexaoParams + "" + dbDataReader + " rdr, bool lazyLoading = false)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            " + tabela.ClasseInfo + " " + tabela.ApelidoInfo + " = new " + tabela.ClasseInfo + "();");
 
@@ -1420,7 +1427,7 @@ namespace GeradorCamadaCSharp
                                 arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToString(rdr[\"" + c.DescricaoDB + "\"]);");
                         }
 
-                        if (existeLazyLoading)
+                        if (existeLazyLoading && chkConsiderarRelacionamentos.Checked)
                         {
                             arquivo.WriteLine("");
                             arquivo.WriteLine("            if (lazyLoading)");
@@ -1430,11 +1437,39 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("            return " + tabela.ApelidoInfo + ";");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
+                        arquivo.WriteLine("        public static " + tabela.ClasseInfo + " NewJoin" + tabela.ClasseInfo + "(" + stringConexaoParams + "" + dbDataReader + " rdr, bool lazyLoading = false)");
+                        arquivo.WriteLine("        {");
+                        arquivo.WriteLine("            " + tabela.ClasseInfo + " " + tabela.ApelidoInfo + " = new " + tabela.ClasseInfo + "();");
+
+                        // Cria new info do data reader
+                        foreach (ColunaInfo c in tabela.colunas)
+                        {
+                            if (c.ChavePrimaria)
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt64(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.Int))
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt32(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.Long))
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt64(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.Decimal))
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToDecimal(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.GetDateTimeOrNull(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToBoolean(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                            else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToImage(rdr, \"" + tabela.Descricao + "_" + c.DescricaoDB + "\");");
+                            else
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToString(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                        }
+                        arquivo.WriteLine("");
+                        arquivo.WriteLine("            return " + tabela.ApelidoInfo + ";");
+                        arquivo.WriteLine("        }");
+                        arquivo.WriteLine("");
 
                         // Cria método lazy loading
-                        if (existeLazyLoading)
+                        if (existeLazyLoading && chkConsiderarRelacionamentos.Checked)
                         {
-                            arquivo.WriteLine("        void LazyLoadingMethod(" + stringConexaoParams + "" + tabela.ClasseInfo + " " + tabela.ApelidoInfo + ")");
+                            arquivo.WriteLine("        static void LazyLoadingMethod(" + stringConexaoParams + "" + tabela.ClasseInfo + " " + tabela.ApelidoInfo + ")");
                             arquivo.WriteLine("        {");
 
                             foreach (ColunaInfo c in tabela.colunas)
