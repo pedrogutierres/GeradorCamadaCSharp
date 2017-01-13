@@ -43,6 +43,7 @@
             this.ordenar = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.novaTabela = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.chkConsiderarRelacionamentos = new System.Windows.Forms.CheckBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.rdbMySQL = new System.Windows.Forms.RadioButton();
             this.rdbADO_Net = new System.Windows.Forms.RadioButton();
@@ -68,7 +69,10 @@
             this.label4 = new System.Windows.Forms.Label();
             this.cmbDatabase = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.chkConsiderarRelacionamentos = new System.Windows.Forms.CheckBox();
+            this.txtFiltroInfo = new System.Windows.Forms.TextBox();
+            this.txtFiltroList = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabAtualiza.SuspendLayout();
@@ -113,7 +117,7 @@
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox2.Location = new System.Drawing.Point(0, 50);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(698, 436);
+            this.groupBox2.Size = new System.Drawing.Size(698, 491);
             this.groupBox2.TabIndex = 0;
             this.groupBox2.TabStop = false;
             // 
@@ -124,7 +128,7 @@
             this.tabAtualiza.Location = new System.Drawing.Point(3, 16);
             this.tabAtualiza.Name = "tabAtualiza";
             this.tabAtualiza.SelectedIndex = 0;
-            this.tabAtualiza.Size = new System.Drawing.Size(692, 417);
+            this.tabAtualiza.Size = new System.Drawing.Size(692, 472);
             this.tabAtualiza.TabIndex = 0;
             // 
             // tabGeral
@@ -134,7 +138,7 @@
             this.tabGeral.Location = new System.Drawing.Point(4, 22);
             this.tabGeral.Name = "tabGeral";
             this.tabGeral.Padding = new System.Windows.Forms.Padding(3);
-            this.tabGeral.Size = new System.Drawing.Size(684, 391);
+            this.tabGeral.Size = new System.Drawing.Size(684, 446);
             this.tabGeral.TabIndex = 0;
             this.tabGeral.Text = "Geral";
             this.tabGeral.UseVisualStyleBackColor = true;
@@ -146,7 +150,7 @@
             this.groupBox4.Dock = System.Windows.Forms.DockStyle.Right;
             this.groupBox4.Location = new System.Drawing.Point(353, 3);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(328, 385);
+            this.groupBox4.Size = new System.Drawing.Size(328, 440);
             this.groupBox4.TabIndex = 1;
             this.groupBox4.TabStop = false;
             // 
@@ -179,7 +183,7 @@
             this.dgTabelasAlteradas.Name = "dgTabelasAlteradas";
             this.dgTabelasAlteradas.RowHeadersVisible = false;
             this.dgTabelasAlteradas.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgTabelasAlteradas.Size = new System.Drawing.Size(322, 366);
+            this.dgTabelasAlteradas.Size = new System.Drawing.Size(322, 421);
             this.dgTabelasAlteradas.TabIndex = 0;
             // 
             // seleciona
@@ -222,6 +226,10 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label5);
+            this.groupBox3.Controls.Add(this.label3);
+            this.groupBox3.Controls.Add(this.txtFiltroList);
+            this.groupBox3.Controls.Add(this.txtFiltroInfo);
             this.groupBox3.Controls.Add(this.chkConsiderarRelacionamentos);
             this.groupBox3.Controls.Add(this.groupBox7);
             this.groupBox3.Controls.Add(this.groupBox6);
@@ -244,9 +252,21 @@
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox3.Location = new System.Drawing.Point(3, 3);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(344, 385);
+            this.groupBox3.Size = new System.Drawing.Size(344, 440);
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
+            // 
+            // chkConsiderarRelacionamentos
+            // 
+            this.chkConsiderarRelacionamentos.AutoSize = true;
+            this.chkConsiderarRelacionamentos.Checked = true;
+            this.chkConsiderarRelacionamentos.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkConsiderarRelacionamentos.Location = new System.Drawing.Point(79, 147);
+            this.chkConsiderarRelacionamentos.Name = "chkConsiderarRelacionamentos";
+            this.chkConsiderarRelacionamentos.Size = new System.Drawing.Size(161, 17);
+            this.chkConsiderarRelacionamentos.TabIndex = 18;
+            this.chkConsiderarRelacionamentos.Text = "Considerar Relacionamentos";
+            this.chkConsiderarRelacionamentos.UseVisualStyleBackColor = true;
             // 
             // groupBox7
             // 
@@ -318,7 +338,7 @@
             // 
             this.groupBox5.Controls.Add(this.rdbREST);
             this.groupBox5.Controls.Add(this.rdbSOAP);
-            this.groupBox5.Location = new System.Drawing.Point(79, 317);
+            this.groupBox5.Location = new System.Drawing.Point(78, 374);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(118, 60);
             this.groupBox5.TabIndex = 15;
@@ -387,7 +407,7 @@
             // chkComunicadorSemNewInstance
             // 
             this.chkComunicadorSemNewInstance.AutoSize = true;
-            this.chkComunicadorSemNewInstance.Location = new System.Drawing.Point(79, 297);
+            this.chkComunicadorSemNewInstance.Location = new System.Drawing.Point(78, 354);
             this.chkComunicadorSemNewInstance.Name = "chkComunicadorSemNewInstance";
             this.chkComunicadorSemNewInstance.Size = new System.Drawing.Size(174, 17);
             this.chkComunicadorSemNewInstance.TabIndex = 14;
@@ -398,7 +418,7 @@
             // lblPacoteWebService
             // 
             this.lblPacoteWebService.AutoSize = true;
-            this.lblPacoteWebService.Location = new System.Drawing.Point(7, 265);
+            this.lblPacoteWebService.Location = new System.Drawing.Point(6, 322);
             this.lblPacoteWebService.Name = "lblPacoteWebService";
             this.lblPacoteWebService.Size = new System.Drawing.Size(66, 26);
             this.lblPacoteWebService.TabIndex = 12;
@@ -407,7 +427,7 @@
             // 
             // txtPacoteWebService
             // 
-            this.txtPacoteWebService.Location = new System.Drawing.Point(79, 271);
+            this.txtPacoteWebService.Location = new System.Drawing.Point(78, 328);
             this.txtPacoteWebService.Name = "txtPacoteWebService";
             this.txtPacoteWebService.Size = new System.Drawing.Size(222, 20);
             this.txtPacoteWebService.TabIndex = 13;
@@ -416,7 +436,7 @@
             // chkWebService
             // 
             this.chkWebService.AutoSize = true;
-            this.chkWebService.Location = new System.Drawing.Point(79, 248);
+            this.chkWebService.Location = new System.Drawing.Point(78, 305);
             this.chkWebService.Name = "chkWebService";
             this.chkWebService.Size = new System.Drawing.Size(117, 17);
             this.chkWebService.TabIndex = 11;
@@ -448,7 +468,7 @@
             this.btnCancelar.FlatAppearance.BorderSize = 0;
             this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancelar.Image = global::GeradorCamadaCSharp.Properties.Resources.Cancel_Ret_32;
-            this.btnCancelar.Location = new System.Drawing.Point(297, 344);
+            this.btnCancelar.Location = new System.Drawing.Point(297, 399);
             this.btnCancelar.Name = "btnCancelar";
             this.btnCancelar.Size = new System.Drawing.Size(35, 35);
             this.btnCancelar.TabIndex = 17;
@@ -464,7 +484,7 @@
             this.btnConfirmarProcesso.FlatAppearance.BorderSize = 0;
             this.btnConfirmarProcesso.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnConfirmarProcesso.Image = global::GeradorCamadaCSharp.Properties.Resources.Save_Ret_32;
-            this.btnConfirmarProcesso.Location = new System.Drawing.Point(256, 344);
+            this.btnConfirmarProcesso.Location = new System.Drawing.Point(256, 399);
             this.btnConfirmarProcesso.Name = "btnConfirmarProcesso";
             this.btnConfirmarProcesso.Size = new System.Drawing.Size(35, 35);
             this.btnConfirmarProcesso.TabIndex = 16;
@@ -504,24 +524,48 @@
             this.cmbDatabase.Size = new System.Drawing.Size(222, 21);
             this.cmbDatabase.TabIndex = 2;
             // 
-            // chkConsiderarRelacionamentos
+            // txtFiltroInfo
             // 
-            this.chkConsiderarRelacionamentos.AutoSize = true;
-            this.chkConsiderarRelacionamentos.Checked = true;
-            this.chkConsiderarRelacionamentos.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkConsiderarRelacionamentos.Location = new System.Drawing.Point(79, 147);
-            this.chkConsiderarRelacionamentos.Name = "chkConsiderarRelacionamentos";
-            this.chkConsiderarRelacionamentos.Size = new System.Drawing.Size(161, 17);
-            this.chkConsiderarRelacionamentos.TabIndex = 18;
-            this.chkConsiderarRelacionamentos.Text = "Considerar Relacionamentos";
-            this.chkConsiderarRelacionamentos.UseVisualStyleBackColor = true;
+            this.txtFiltroInfo.Location = new System.Drawing.Point(79, 242);
+            this.txtFiltroInfo.Name = "txtFiltroInfo";
+            this.txtFiltroInfo.Size = new System.Drawing.Size(222, 20);
+            this.txtFiltroInfo.TabIndex = 19;
+            this.txtFiltroInfo.Visible = false;
+            // 
+            // txtFiltroList
+            // 
+            this.txtFiltroList.Location = new System.Drawing.Point(79, 268);
+            this.txtFiltroList.Name = "txtFiltroList";
+            this.txtFiltroList.Size = new System.Drawing.Size(222, 20);
+            this.txtFiltroList.TabIndex = 20;
+            this.txtFiltroList.Visible = false;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(22, 245);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(50, 13);
+            this.label3.TabIndex = 21;
+            this.label3.Text = "Filtro Info";
+            this.label3.Visible = false;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(23, 271);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(48, 13);
+            this.label5.TabIndex = 22;
+            this.label5.Text = "Filtro List";
+            this.label5.Visible = false;
             // 
             // frmPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(698, 486);
+            this.ClientSize = new System.Drawing.Size(698, 541);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Name = "frmPrincipal";
@@ -588,6 +632,10 @@
         private System.Windows.Forms.RadioButton rdbMySQL;
         private System.Windows.Forms.RadioButton rdbADO_Net;
         private System.Windows.Forms.CheckBox chkConsiderarRelacionamentos;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtFiltroList;
+        private System.Windows.Forms.TextBox txtFiltroInfo;
     }
 }
 

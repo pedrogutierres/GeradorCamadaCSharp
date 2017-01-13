@@ -351,6 +351,9 @@ namespace GeradorCamadaCSharp
             Imagem
         }
 
+        private List<string> FiltroInfo = new List<string>();
+        private List<string> FiltroList = new List<string>();
+
         public frmPrincipal()
         {
             InitializeComponent();
@@ -484,6 +487,9 @@ namespace GeradorCamadaCSharp
                 string dataPadraoCriacao = "datahora_criacao";
                 string dataPadraoAlteracao = "datahora_alteracao";
 
+
+
+
                 string comando = @"
                     SELECT *, 0 as ordenar
                        FROM INFORMATION_SCHEMA.`TABLES`
@@ -589,8 +595,6 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("");
                         arquivo.WriteLine("    public partial class " + tabela.ClasseInfo + " : BaseInfo");
                         arquivo.WriteLine("    {");
-                        arquivo.WriteLine("        private Funcoes mFuncoes;");
-                        arquivo.WriteLine("");
 
                         // Cria variaveis privadas
                         foreach (ColunaInfo c in tabela.colunas)
@@ -629,7 +633,7 @@ namespace GeradorCamadaCSharp
 
                         arquivo.WriteLine("        public " + tabela.ClasseInfo + "()");
                         arquivo.WriteLine("        {");
-                        arquivo.WriteLine("            mFuncoes = Funcoes.newInstance();");
+                        arquivo.WriteLine("");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("        public " + tabela.ClasseInfo + "(" + tabela.ClasseInfo + " t)");
@@ -710,7 +714,6 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("    public abstract class Base" + tabela.ClasseBo);
                         arquivo.WriteLine("    {");
                         arquivo.WriteLine("        protected static Base" + tabela.ClasseBo + " " + tabela.ApelidoBo + ";");
-                        arquivo.WriteLine("        protected static Funcoes mFuncoes;");
                         arquivo.WriteLine("        protected static " + tabela.ClasseDao + " " + tabela.ApelidoDao + ";");
                         arquivo.WriteLine("");
                         if (chkValidacoesColuna.Checked)
@@ -722,7 +725,6 @@ namespace GeradorCamadaCSharp
 
                         arquivo.WriteLine("        protected Base" + tabela.ClasseBo + "()");
                         arquivo.WriteLine("        {");
-                        arquivo.WriteLine("            mFuncoes = Funcoes.newInstance();");
                         arquivo.WriteLine("            " + tabela.ApelidoDao + " = DAOFactory.get" + tabela.ClasseDao + "();");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
@@ -821,12 +823,12 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            try");
                         arquivo.WriteLine("            {");
-                        arquivo.WriteLine("                " + dbTransaction + " trans = mFuncoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
+                        arquivo.WriteLine("                " + dbTransaction + " trans = Global.Funcoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
                         arquivo.WriteLine("                bool sucesso = Salvar(_obj, trans);");
                         arquivo.WriteLine("                if (sucesso)");
-                        arquivo.WriteLine("                    mFuncoes.CommitTransaction(trans);");
+                        arquivo.WriteLine("                    Global.Funcoes.CommitTransaction(trans);");
                         arquivo.WriteLine("                else");
-                        arquivo.WriteLine("                    mFuncoes.RollbackTransaction(trans);");
+                        arquivo.WriteLine("                    Global.Funcoes.RollbackTransaction(trans);");
                         arquivo.WriteLine("                return sucesso;");
                         arquivo.WriteLine("            }");
                         arquivo.WriteLine("            catch");
@@ -850,12 +852,12 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            try");
                         arquivo.WriteLine("            {");
-                        arquivo.WriteLine("                " + dbTransaction + " trans = mFuncoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
+                        arquivo.WriteLine("                " + dbTransaction + " trans = Global.Funcoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
                         arquivo.WriteLine("                bool sucesso = Excluir(Id, trans);");
                         arquivo.WriteLine("                if (sucesso)");
-                        arquivo.WriteLine("                    mFuncoes.CommitTransaction(trans);");
+                        arquivo.WriteLine("                    Global.Funcoes.CommitTransaction(trans);");
                         arquivo.WriteLine("                else");
-                        arquivo.WriteLine("                    mFuncoes.RollbackTransaction(trans);");
+                        arquivo.WriteLine("                    Global.Funcoes.RollbackTransaction(trans);");
                         arquivo.WriteLine("                return sucesso;");
                         arquivo.WriteLine("            }");
                         arquivo.WriteLine("            catch");
@@ -1069,11 +1071,9 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("{");
                         arquivo.WriteLine("    public partial class " + tabela.ClasseDao);
                         arquivo.WriteLine("    {");
-                        arquivo.WriteLine("        private static Funcoes mFuncoes;");
-                        arquivo.WriteLine("");
                         arquivo.WriteLine("        public " + tabela.ClasseDao + "()");
                         arquivo.WriteLine("        {");
-                        arquivo.WriteLine("            mFuncoes = Funcoes.newInstance();");
+                        arquivo.WriteLine("");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("        #region Parametros");
@@ -1184,7 +1184,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("        public bool Inserir(" + tabela.ClasseInfo + " _obj, " + dbTransaction + " _trans)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            long id = 0;");
-                        arquivo.WriteLine("            bool sucesso = mFuncoes.ExecuteNonQuery(_trans, CommandType.Text, cmdInserir, New" + tabela.Classe + "Parameters(_obj, false), out id);");
+                        arquivo.WriteLine("            bool sucesso = Global.Funcoes.ExecuteNonQuery(_trans, CommandType.Text, cmdInserir, New" + tabela.Classe + "Parameters(_obj, false), out id);");
                         arquivo.WriteLine("            if (sucesso && id > 0)");
                         arquivo.WriteLine("                _obj." + chavePrimaria + " = id;");
                         arquivo.WriteLine("            return sucesso;");
@@ -1192,7 +1192,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("");
                         arquivo.WriteLine("        public bool Atualizar(" + tabela.ClasseInfo + " _obj, " + dbTransaction + " _trans)");
                         arquivo.WriteLine("        {");
-                        arquivo.WriteLine("            return mFuncoes.ExecuteNonQuery(_trans, CommandType.Text, cmdAlterar, New" + tabela.Classe + "Parameters(_obj, true));");
+                        arquivo.WriteLine("            return Global.Funcoes.ExecuteNonQuery(_trans, CommandType.Text, cmdAlterar, New" + tabela.Classe + "Parameters(_obj, true));");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("        public bool Salvar(" + tabela.ClasseInfo + " _obj, " + dbTransaction + " _trans)");
@@ -1203,16 +1203,16 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("        public bool Excluir(long " + chavePrimaria + ", " + dbTransaction + " _trans)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            " + dbParameter + "[] parms = new " + dbParameter + "[1];");
-                        arquivo.WriteLine("            parms[0] = mFuncoes.CreateParameter(param" + chavePrimaria + ", " + dbType + ".Int64, " + chavePrimaria + ");");
-                        arquivo.WriteLine("            return mFuncoes.ExecuteNonQuery(_trans, CommandType.Text, cmdExcluiPorId, parms);");
+                        arquivo.WriteLine("            parms[0] = Global.Funcoes.CreateParameter(param" + chavePrimaria + ", " + dbType + ".Int64, " + chavePrimaria + ");");
+                        arquivo.WriteLine("            return Global.Funcoes.ExecuteNonQuery(_trans, CommandType.Text, cmdExcluiPorId, parms);");
                         arquivo.WriteLine("        }");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("        public " + tabela.ClasseInfo + " RetornaPorId(" + stringConexaoParams + "long " + chavePrimaria + ", bool lazyLoading = false)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            " + dbParameter + "[] parms = new " + dbParameter + "[1];");
-                        arquivo.WriteLine("            parms[0] = mFuncoes.CreateParameter(param" + chavePrimaria + ", " + dbType + ".Int64, " + chavePrimaria + ");");
+                        arquivo.WriteLine("            parms[0] = Global.Funcoes.CreateParameter(param" + chavePrimaria + ", " + dbType + ".Int64, " + chavePrimaria + ");");
                         arquivo.WriteLine("");
-                        arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaPorId, parms))");
+                        arquivo.WriteLine("            using (" + dbDataReader + " rdr = Global.Funcoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaPorId, parms))");
                         arquivo.WriteLine("            {");
                         arquivo.WriteLine("                if (rdr.Read())");
                         arquivo.WriteLine("                    return New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading);");
@@ -1250,9 +1250,9 @@ namespace GeradorCamadaCSharp
                                     arquivo.WriteLine("        public " + tabela.ClasseInfo + " Retorna" + pesquisaPor + "(" + stringConexaoParams + variavel + " " + c.Descricao + ", bool lazyLoading = false)");
                                     arquivo.WriteLine("        {");
                                     arquivo.WriteLine("            " + dbParameter + "[] parms = new " + dbParameter + "[1];");
-                                    arquivo.WriteLine("            parms[0] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + "." + variavelDbType + ", " + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[0] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + "." + variavelDbType + ", " + c.Descricao + ");");
                                     arquivo.WriteLine("");
-                                    arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
+                                    arquivo.WriteLine("            using (" + dbDataReader + " rdr = Global.Funcoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
                                     arquivo.WriteLine("            {");
                                     arquivo.WriteLine("                if (rdr.Read())");
                                     arquivo.WriteLine("                    return New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading);");
@@ -1266,10 +1266,10 @@ namespace GeradorCamadaCSharp
                                     arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + stringConexaoParams + variavel + " " + c.Descricao + ", bool lazyLoading = false)");
                                     arquivo.WriteLine("        {");
                                     arquivo.WriteLine("            " + dbParameter + "[] parms = new " + dbParameter + "[1];");
-                                    arquivo.WriteLine("            parms[0] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + "." + variavelDbType + ", " + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[0] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + "." + variavelDbType + ", " + c.Descricao + ");");
                                     arquivo.WriteLine("");
                                     arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> lst = new List<" + tabela.ClasseInfo + ">();");
-                                    arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
+                                    arquivo.WriteLine("            using (" + dbDataReader + " rdr = Global.Funcoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
                                     arquivo.WriteLine("            {");
                                     arquivo.WriteLine("                while (rdr.Read())");
                                     arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading));");
@@ -1290,11 +1290,11 @@ namespace GeradorCamadaCSharp
                                 arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + stringConexaoParams + "DateTime dataInicial, DateTime dataFinal, bool lazyLoading = false)");
                                 arquivo.WriteLine("        {");
                                 arquivo.WriteLine("            " + dbParameter + "[] parms = new " + dbParameter + "[2];");
-                                arquivo.WriteLine("            parms[0] = mFuncoes.CreateParameter(paramPDataInicial, " + dbType + ".DateTime, dataInicial);");
-                                arquivo.WriteLine("            parms[1] = mFuncoes.CreateParameter(paramPDataFinal, " + dbType + ".DateTime, dataFinal);");
+                                arquivo.WriteLine("            parms[0] = Global.Funcoes.CreateParameter(paramPDataInicial, " + dbType + ".DateTime, dataInicial);");
+                                arquivo.WriteLine("            parms[1] = Global.Funcoes.CreateParameter(paramPDataFinal, " + dbType + ".DateTime, dataFinal);");
                                 arquivo.WriteLine("");
                                 arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> lst = new List<" + tabela.ClasseInfo + ">();");
-                                arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
+                                arquivo.WriteLine("            using (" + dbDataReader + " rdr = Global.Funcoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
                                 arquivo.WriteLine("            {");
                                 arquivo.WriteLine("                while (rdr.Read())");
                                 arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading));");
@@ -1325,26 +1325,26 @@ namespace GeradorCamadaCSharp
                             {
                                 string variavel = EnumDescription.GetDescription(c.TipoVariavel);
                                 if (c.TipoVariavel.Equals(TipoVariavelEnum.Int))
-                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Int32, " + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Int32, " + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Long))
-                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Int64, " + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Int64, " + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Decimal))
-                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Decimal, " + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Decimal, " + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
-                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".DateTime, " + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".DateTime, " + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
-                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + "." + dbTypeBoolean + ", " + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + "." + dbTypeBoolean + ", " + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
-                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".LongBlob, mFuncoes.ConvertImageToByteArray(" + c.Descricao + "));");
+                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".LongBlob, Global.Funcoes.ConvertImageToByteArray(" + c.Descricao + "));");
                                 else
-                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".String, " + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParmsJoin + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".String, " + c.Descricao + ");");
 
                                 xParmsJoin++;
                             }
 
                             arquivo.WriteLine("");
                             arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> lst = new List<" + tabela.ClasseInfo + ">();");
-                            arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaPorParametros, parms))");
+                            arquivo.WriteLine("            using (" + dbDataReader + " rdr = Global.Funcoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaPorParametros, parms))");
                             arquivo.WriteLine("            {");
                             arquivo.WriteLine("                while (rdr.Read())");
                             arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading));");
@@ -1357,7 +1357,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaTodos(" + stringConexaoParams + "bool lazyLoading = false)");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> lst = new List<" + tabela.ClasseInfo + ">();");
-                        arquivo.WriteLine("            using (" + dbDataReader + " rdr = mFuncoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaTodos, null))");
+                        arquivo.WriteLine("            using (" + dbDataReader + " rdr = Global.Funcoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetornaTodos, null))");
                         arquivo.WriteLine("            {");
                         arquivo.WriteLine("                while (rdr.Read())");
                         arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading));");
@@ -1377,19 +1377,19 @@ namespace GeradorCamadaCSharp
                             if (!c.ChavePrimaria)
                             {
                                 if (c.TipoVariavel.Equals(TipoVariavelEnum.Int))
-                                    arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Int32, _obj." + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParms + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Int32, _obj." + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Long))
-                                    arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Int64, _obj." + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParms + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Int64, _obj." + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Decimal))
-                                    arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Decimal, _obj." + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParms + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".Decimal, _obj." + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
-                                    arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".DateTime, _obj." + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParms + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".DateTime, _obj." + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
-                                    arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + "." + dbTypeBoolean + ", _obj." + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParms + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + "." + dbTypeBoolean + ", _obj." + c.Descricao + ");");
                                 else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
-                                    arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".LongBlob, mFuncoes.ConvertImageToByteArray(_obj." + c.Descricao + "));");
+                                    arquivo.WriteLine("            parms[" + xParms + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".LongBlob, Global.Funcoes.ConvertImageToByteArray(_obj." + c.Descricao + "));");
                                 else
-                                    arquivo.WriteLine("            parms[" + xParms + "] = mFuncoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".String, _obj." + c.Descricao + ");");
+                                    arquivo.WriteLine("            parms[" + xParms + "] = Global.Funcoes.CreateParameter(param" + c.Descricao + ", " + dbType + ".String, _obj." + c.Descricao + ");");
 
                                 xParms++;
                             }
@@ -1397,7 +1397,7 @@ namespace GeradorCamadaCSharp
                         // Adiciona o parametro do ID
                         arquivo.WriteLine("");
                         arquivo.WriteLine("            if (withId)");
-                        arquivo.WriteLine("                parms[" + xParms + "] = mFuncoes.CreateParameter(param" + chavePrimaria + ", " + dbType + ".Int64, _obj." + chavePrimaria + ");");
+                        arquivo.WriteLine("                parms[" + xParms + "] = Global.Funcoes.CreateParameter(param" + chavePrimaria + ", " + dbType + ".Int64, _obj." + chavePrimaria + ");");
                         arquivo.WriteLine("");
                         arquivo.WriteLine("            return parms;");
                         arquivo.WriteLine("        }");
@@ -1410,21 +1410,21 @@ namespace GeradorCamadaCSharp
                         foreach (ColunaInfo c in tabela.colunas)
                         {
                             if (c.ChavePrimaria)
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt64(rdr[\"" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToInt64(rdr[\"" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Int))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt32(rdr[\"" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToInt32(rdr[\"" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Long))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt64(rdr[\"" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToInt64(rdr[\"" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Decimal))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToDecimal(rdr[\"" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToDecimal(rdr[\"" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.GetDateTimeOrNull(rdr[\"" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.GetDateTimeOrNull(rdr[\"" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToBoolean(rdr[\"" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToBoolean(rdr[\"" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToImage(rdr, \"" + c.DescricaoDB + "\");");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToImage(rdr, \"" + c.DescricaoDB + "\");");
                             else
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToString(rdr[\"" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToString(rdr[\"" + c.DescricaoDB + "\"]);");
                         }
 
                         if (existeLazyLoading && chkConsiderarRelacionamentos.Checked)
@@ -1445,21 +1445,21 @@ namespace GeradorCamadaCSharp
                         foreach (ColunaInfo c in tabela.colunas)
                         {
                             if (c.ChavePrimaria)
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt64(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToInt64(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Int))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt32(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToInt32(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Long))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToInt64(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToInt64(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Decimal))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToDecimal(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToDecimal(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.GetDateTimeOrNull(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.GetDateTimeOrNull(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToBoolean(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToBoolean(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                             else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToImage(rdr, \"" + tabela.Descricao + "_" + c.DescricaoDB + "\");");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToImage(rdr, \"" + tabela.Descricao + "_" + c.DescricaoDB + "\");");
                             else
-                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = mFuncoes.ConvertToString(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                                arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToString(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                         }
                         arquivo.WriteLine("");
                         arquivo.WriteLine("            return " + tabela.ApelidoInfo + ";");
@@ -2744,6 +2744,17 @@ namespace GeradorCamadaCSharp
                         #endregion
                     }
 
+                    #region CriaArquivo Global
+                    File.Create(diretorio + "\\Util\\Global.cs").Close();
+                    using (TextWriter arquivo = File.AppendText(diretorio + "\\Util\\Global.cs"))
+                    {
+                        arquivo.Write(Library.ArquivoGlobal.RetornaTextoArquivo(txtPacote.Text));
+
+                        arquivo.Flush();
+                        arquivo.Close();
+                    }
+                    #endregion
+
                     #region CriaArquivo BaseInfo
                     File.Create(diretorio + "\\BaseObjects\\BaseInfo.cs").Close();
                     using (TextWriter arquivo = File.AppendText(diretorio + "\\BaseObjects\\BaseInfo.cs"))
@@ -2864,6 +2875,12 @@ namespace GeradorCamadaCSharp
                 {
                     lista = true;
                     join = true;
+                }
+                else if (!string.IsNullOrEmpty(c.Comentario) && c.Comentario.ToUpper().Contains("FILTROINFO"))
+                { }
+                else if (!string.IsNullOrEmpty(c.Comentario) && c.Comentario.ToUpper().Contains("FILTROLIST"))
+                {
+                    lista = true;
                 }
                 else
                     ok = false;
