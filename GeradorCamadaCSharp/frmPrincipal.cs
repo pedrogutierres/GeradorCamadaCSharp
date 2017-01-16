@@ -487,9 +487,6 @@ namespace GeradorCamadaCSharp
                 string dataPadraoCriacao = "datahora_criacao";
                 string dataPadraoAlteracao = "datahora_alteracao";
 
-
-
-
                 string comando = @"
                     SELECT *, 0 as ordenar
                        FROM INFORMATION_SCHEMA.`TABLES`
@@ -623,10 +620,30 @@ namespace GeradorCamadaCSharp
                             {
                                 if (!string.IsNullOrEmpty(c.ClasseRelacionalInfo))
                                 {
-                                    if (existeComment)
-                                        arquivo.WriteLine("        [JsonProperty(\"" + c.ClasseRelacionalApelido + "\")]");
+                                    if (chkConsiderarRelacionamentosSetIdPorInfo.Checked)
+                                    {
+                                        arquivo.WriteLine("        private " + c.ClasseRelacionalInfo + " _" + c.ClasseRelacionalApelido + " { get; set; }");
+                                        if (existeComment)
+                                            arquivo.WriteLine("        [JsonProperty(\"" + c.ClasseRelacionalApelido + "\")]");
+                                        arquivo.WriteLine("        public " + c.ClasseRelacionalInfo + " " + c.ClasseRelacionalApelido);
+                                        arquivo.WriteLine("        {");
+                                        arquivo.WriteLine("            get { return _" + c.ClasseRelacionalApelido + "; }");
+                                        arquivo.WriteLine("            set");
+                                        arquivo.WriteLine("            {");
+                                        arquivo.WriteLine("                _" + c.ClasseRelacionalApelido + " = value;");
+                                        arquivo.WriteLine("                if (_" + c.ClasseRelacionalApelido + " != null && _" + c.ClasseRelacionalApelido + ".Id > 0)");
+                                        arquivo.WriteLine("                    " + c.Descricao + " = _" + c.ClasseRelacionalApelido + ".Id;");
+                                        arquivo.WriteLine("            }");
+                                        arquivo.WriteLine("        }");
+                                        
+                                    }
+                                    else
+                                    {
+                                        if (existeComment)
+                                            arquivo.WriteLine("        [JsonProperty(\"" + c.ClasseRelacionalApelido + "\")]");
 
-                                    arquivo.WriteLine("        public " + c.ClasseRelacionalInfo + " " + c.ClasseRelacionalApelido + " { get; set; }");
+                                        arquivo.WriteLine("        public " + c.ClasseRelacionalInfo + " " + c.ClasseRelacionalApelido + " { get; set; }");
+                                    }
                                 }
                             }
                         }
