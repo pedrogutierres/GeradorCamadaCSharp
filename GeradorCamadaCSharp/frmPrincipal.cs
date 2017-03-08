@@ -919,6 +919,8 @@ namespace GeradorCamadaCSharp
 
                                 if (variavel.Equals("integer"))
                                     variavel = "int";
+                                else if (variavel.Equals("datetime"))
+                                    variavel = "DateTime";
 
                                 string pesquisaPor = "Por" + c.Descricao;
 
@@ -996,6 +998,11 @@ namespace GeradorCamadaCSharp
                             foreach (ColunaInfo c in joins)
                             {
                                 string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+
+                                if (variavel.Equals("integer"))
+                                    variavel = "int";
+                                else if (variavel.Equals("datetime"))
+                                    variavel = "DateTime";
 
                                 parametros.Append(variavel + " " + c.Descricao + ", ");
 
@@ -1181,7 +1188,7 @@ namespace GeradorCamadaCSharp
                             {
                                 string pesquisaPor = "Por" + c.Descricao;
 
-                                arquivo.WriteLine("        const string cmdRetorna" + pesquisaPor + " = \"select * from " + tabela.Descricao + " where " + c.DescricaoDB + " between ?pDataInicial and ?pDataFinal \";");
+                                arquivo.WriteLine("        const string cmdRetorna" + pesquisaPor + "Periodo = \"select * from " + tabela.Descricao + " where " + c.DescricaoDB + " between ?pDataInicial and ?pDataFinal \";");
                             }
                         }
 
@@ -1311,7 +1318,7 @@ namespace GeradorCamadaCSharp
                                 arquivo.WriteLine("            parms[1] = Global.Funcoes.CreateParameter(paramPDataFinal, " + dbType + ".DateTime, dataFinal);");
                                 arquivo.WriteLine("");
                                 arquivo.WriteLine("            List<" + tabela.ClasseInfo + "> lst = new List<" + tabela.ClasseInfo + ">();");
-                                arquivo.WriteLine("            using (" + dbDataReader + " rdr = Global.Funcoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + ", parms))");
+                                arquivo.WriteLine("            using (" + dbDataReader + " rdr = Global.Funcoes.ExecuteReader(" + stringConexao + "CommandType.Text, cmdRetorna" + pesquisaPor + "Periodo, parms))");
                                 arquivo.WriteLine("            {");
                                 arquivo.WriteLine("                while (rdr.Read())");
                                 arquivo.WriteLine("                    lst.Add(New" + tabela.ClasseInfo + "(" + stringConexao + "rdr, lazyLoading));");
@@ -2061,6 +2068,8 @@ namespace GeradorCamadaCSharp
 
                                     if (variavel.Equals("integer"))
                                         variavel = "int";
+                                    else if (variavel.Equals("datetime"))
+                                        variavel = "DateTime";
 
                                     string pesquisaPor = "Por" + c.Descricao;
 
@@ -2183,6 +2192,11 @@ namespace GeradorCamadaCSharp
                                 foreach (ColunaInfo c in joins)
                                 {
                                     string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+
+                                    if (variavel.Equals("integer"))
+                                        variavel = "int";
+                                    else if (variavel.Equals("datetime"))
+                                        variavel = "DateTime";
 
                                     parametros.Append(variavel + " " + c.Descricao + ", ");
 
@@ -2559,6 +2573,8 @@ namespace GeradorCamadaCSharp
 
                                     if (variavel.Equals("integer"))
                                         variavel = "int";
+                                    else if (variavel.Equals("datetime"))
+                                        variavel = "DateTime";
 
                                     string pesquisaPor = "Por" + c.Descricao;
 
@@ -2613,6 +2629,11 @@ namespace GeradorCamadaCSharp
                                 foreach (ColunaInfo c in joins)
                                 {
                                     string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+
+                                    if (variavel.Equals("integer"))
+                                        variavel = "int";
+                                    else if (variavel.Equals("datetime"))
+                                        variavel = "DateTime";
 
                                     parametros.Append(variavel + " " + c.Descricao + ", ");
 
@@ -2895,6 +2916,11 @@ namespace GeradorCamadaCSharp
                 }
                 else if (!string.IsNullOrEmpty(c.Comentario) && c.Comentario.ToUpper().Contains("FILTROINFO"))
                 { }
+                else if (!string.IsNullOrEmpty(c.Comentario) && c.Comentario.ToUpper().Contains("FILTROLISTJOIN"))
+                {
+                    lista = true;
+                    join = true;
+                }
                 else if (!string.IsNullOrEmpty(c.Comentario) && c.Comentario.ToUpper().Contains("FILTROLIST"))
                 {
                     lista = true;
