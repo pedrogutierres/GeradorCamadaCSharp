@@ -915,12 +915,12 @@ namespace GeradorCamadaCSharp
                                     variavelLazyLoading = ", lazyLoading";
                                 }
 
-                                string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+                                string variavel = EnumDescription.GetDescription(c.TipoVariavel);
 
-                                if (variavel.Equals("integer"))
-                                    variavel = "int";
-                                else if (variavel.Equals("datetime"))
-                                    variavel = "DateTime";
+                                //if (variavel.Equals("integer"))
+                                //    variavel = "int";
+                                //else if (variavel.Equals("datetime"))
+                                //    variavel = "DateTime";
 
                                 string pesquisaPor = "Por" + c.Descricao;
 
@@ -997,12 +997,12 @@ namespace GeradorCamadaCSharp
 
                             foreach (ColunaInfo c in joins)
                             {
-                                string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+                                string variavel = EnumDescription.GetDescription(c.TipoVariavel);
 
-                                if (variavel.Equals("integer"))
-                                    variavel = "int";
-                                else if (variavel.Equals("datetime"))
-                                    variavel = "DateTime";
+                                //if (variavel.Equals("integer"))
+                                //    variavel = "int";
+                                //else if (variavel.Equals("datetime"))
+                                //    variavel = "DateTime";
 
                                 parametros.Append(variavel + " " + c.Descricao + ", ");
 
@@ -2064,12 +2064,12 @@ namespace GeradorCamadaCSharp
                                     if (join)
                                         joins.Add(c);
 
-                                    string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+                                    string variavel = EnumDescription.GetDescription(c.TipoVariavel);
 
-                                    if (variavel.Equals("integer"))
-                                        variavel = "int";
-                                    else if (variavel.Equals("datetime"))
-                                        variavel = "DateTime";
+                                    //if (variavel.Equals("integer"))
+                                    //    variavel = "int";
+                                    //else if (variavel.Equals("datetime"))
+                                    //    variavel = "DateTime";
 
                                     string pesquisaPor = "Por" + c.Descricao;
 
@@ -2191,12 +2191,12 @@ namespace GeradorCamadaCSharp
 
                                 foreach (ColunaInfo c in joins)
                                 {
-                                    string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+                                    string variavel = EnumDescription.GetDescription(c.TipoVariavel);
 
-                                    if (variavel.Equals("integer"))
-                                        variavel = "int";
-                                    else if (variavel.Equals("datetime"))
-                                        variavel = "DateTime";
+                                    //if (variavel.Equals("integer"))
+                                    //    variavel = "int";
+                                    //else if (variavel.Equals("datetime"))
+                                    //    variavel = "DateTime";
 
                                     parametros.Append(variavel + " " + c.Descricao + ", ");
 
@@ -2569,12 +2569,12 @@ namespace GeradorCamadaCSharp
                                         variavelLazyLoading = ", lazyLoading";
                                     }
 
-                                    string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+                                    string variavel = EnumDescription.GetDescription(c.TipoVariavel);
 
-                                    if (variavel.Equals("integer"))
-                                        variavel = "int";
-                                    else if (variavel.Equals("datetime"))
-                                        variavel = "DateTime";
+                                    //if (variavel.Equals("integer"))
+                                    //    variavel = "int";
+                                    //else if (variavel.Equals("datetime"))
+                                    //    variavel = "DateTime";
 
                                     string pesquisaPor = "Por" + c.Descricao;
 
@@ -2628,12 +2628,12 @@ namespace GeradorCamadaCSharp
 
                                 foreach (ColunaInfo c in joins)
                                 {
-                                    string variavel = c.TipoVariavel.ToString().StartsWith("S") ? c.TipoVariavel.ToString() : c.TipoVariavel.ToString().ToLower();
+                                    string variavel = EnumDescription.GetDescription(c.TipoVariavel);
 
-                                    if (variavel.Equals("integer"))
-                                        variavel = "int";
-                                    else if (variavel.Equals("datetime"))
-                                        variavel = "DateTime";
+                                    //if (variavel.Equals("integer"))
+                                    //    variavel = "int";
+                                    //else if (variavel.Equals("datetime"))
+                                    //    variavel = "DateTime";
 
                                     parametros.Append(variavel + " " + c.Descricao + ", ");
 
