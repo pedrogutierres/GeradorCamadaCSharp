@@ -770,7 +770,7 @@ namespace GeradorCamadaCSharp
 
                     if (chkValidacoesColuna.Checked)
                     {
-                        arquivo.WriteLine("        public void ValidarDados(" + tabela.ClasseInfo + " _obj)");
+                        arquivo.WriteLine("        public virtual void ValidarDados(" + tabela.ClasseInfo + " _obj)");
                         arquivo.WriteLine("        {");
 
                         bool primeiraVariavel = true;
@@ -905,7 +905,7 @@ namespace GeradorCamadaCSharp
                     arquivo.WriteLine("            }");
                     arquivo.WriteLine("        }");
                     arquivo.WriteLine("");
-                    arquivo.WriteLine("        public " + tabela.ClasseInfo + " RetornaPorId(" + stringConexaoParams + "long Id, bool lazyLoading = false)");
+                    arquivo.WriteLine("        public virtual " + tabela.ClasseInfo + " RetornaPorId(" + stringConexaoParams + "long Id, bool lazyLoading = false)");
                     arquivo.WriteLine("        {");
                     arquivo.WriteLine("            try");
                     arquivo.WriteLine("            {");
@@ -948,7 +948,7 @@ namespace GeradorCamadaCSharp
 
                             if (!lista)
                             {
-                                arquivo.WriteLine("        public " + tabela.ClasseInfo + " Retorna" + pesquisaPor + "(" + stringConexaoParams + variavel + " " + c.Descricao + parametroLazyLoading + ")");
+                                arquivo.WriteLine("        public virtual " + tabela.ClasseInfo + " Retorna" + pesquisaPor + "(" + stringConexaoParams + variavel + " " + c.Descricao + parametroLazyLoading + ")");
                                 arquivo.WriteLine("        {");
                                 arquivo.WriteLine("            try");
                                 arquivo.WriteLine("            {");
@@ -963,7 +963,7 @@ namespace GeradorCamadaCSharp
                             }
                             else
                             {
-                                arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + stringConexaoParams + variavel + " " + c.Descricao + parametroLazyLoading + ")");
+                                arquivo.WriteLine("        public virtual List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + stringConexaoParams + variavel + " " + c.Descricao + parametroLazyLoading + ")");
                                 arquivo.WriteLine("        {");
                                 arquivo.WriteLine("            try");
                                 arquivo.WriteLine("            {");
@@ -997,7 +997,7 @@ namespace GeradorCamadaCSharp
                         {
                             string pesquisaPor = "Por" + c.Descricao;
 
-                            arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + stringConexaoParams + "DateTime dataInicial, DateTime dataFinal" + parametroLazyLoading + ")");
+                            arquivo.WriteLine("        public virtual List<" + tabela.ClasseInfo + "> Retorna" + pesquisaPor + "(" + stringConexaoParams + "DateTime dataInicial, DateTime dataFinal" + parametroLazyLoading + ")");
                             arquivo.WriteLine("        {");
                             arquivo.WriteLine("            try");
                             arquivo.WriteLine("            {");
@@ -1031,7 +1031,7 @@ namespace GeradorCamadaCSharp
                             parametrosPassar.Append(c.Descricao + ", ");
                         }
 
-                        arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaPorParametros(" + stringConexaoParams + parametros.ToString().Remove(parametros.Length - 2, 2) + parametroLazyLoading + ")");
+                        arquivo.WriteLine("        public virtual List<" + tabela.ClasseInfo + "> RetornaPorParametros(" + stringConexaoParams + parametros.ToString().Remove(parametros.Length - 2, 2) + parametroLazyLoading + ")");
                         arquivo.WriteLine("        {");
                         arquivo.WriteLine("            try");
                         arquivo.WriteLine("            {");
@@ -1045,7 +1045,7 @@ namespace GeradorCamadaCSharp
                         arquivo.WriteLine("");
                     }
 
-                    arquivo.WriteLine("        public List<" + tabela.ClasseInfo + "> RetornaTodos(" + (parametroLazyLoading.Length > 0 ? stringConexaoParams + parametroLazyLoading.Substring(2) : stringConexaoParams.Replace(", ", "")) + ")");
+                    arquivo.WriteLine("        public virtual List<" + tabela.ClasseInfo + "> RetornaTodos(" + (parametroLazyLoading.Length > 0 ? stringConexaoParams + parametroLazyLoading.Substring(2) : stringConexaoParams.Replace(", ", "")) + ")");
                     arquivo.WriteLine("        {");
                     arquivo.WriteLine("            try");
                     arquivo.WriteLine("            {");
