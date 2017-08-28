@@ -891,7 +891,7 @@ namespace GeradorCamadaCSharp
                     arquivo.WriteLine("        {");
                     arquivo.WriteLine("            try");
                     arquivo.WriteLine("            {");
-                    arquivo.WriteLine("                MySqlTransaction trans = Global.Funcoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
+                    arquivo.WriteLine("                " + dbTransaction + " trans = Global.Funcoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
                     arquivo.WriteLine("                bool sucesso = InserirComID(_obj, trans);");
                     arquivo.WriteLine("                if (sucesso)");
                     arquivo.WriteLine("                    Global.Funcoes.CommitTransaction(trans);");
@@ -949,7 +949,7 @@ namespace GeradorCamadaCSharp
                     arquivo.WriteLine("        {");
                     arquivo.WriteLine("            try");
                     arquivo.WriteLine("            {");
-                    arquivo.WriteLine("                MySqlTransaction trans = Global.Funcoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
+                    arquivo.WriteLine("                " + dbTransaction + " trans = Global.Funcoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
                     arquivo.WriteLine("                bool sucesso = ExcluirTodos(trans);");
                     arquivo.WriteLine("                if (sucesso)");
                     arquivo.WriteLine("                    Global.Funcoes.CommitTransaction(trans);");
