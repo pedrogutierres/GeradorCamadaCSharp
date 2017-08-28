@@ -286,7 +286,7 @@ namespace GeradorCamadaCSharp
                     {
                         TipoVariavel = TipoVariavelEnum.String;
                     }
-                    else if (tipo.Contains("BIGINT") || tipo.Contains("LONGBLOB"))
+                    else if (tipo.Contains("BIGINT"))
                     {
                         TipoVariavel = TipoVariavelEnum.Long;
                     }
@@ -294,7 +294,7 @@ namespace GeradorCamadaCSharp
                     {
                         TipoVariavel = TipoVariavelEnum.Bool;
                     }
-                    else if (tipo.Contains("BLOB"))
+                    else if (tipo.Contains("BLOB") || tipo.Contains("LONGBLOB"))
                     {
                         TipoVariavel = TipoVariavelEnum.Imagem;
                     }
@@ -627,7 +627,7 @@ namespace GeradorCamadaCSharp
                             arquivo.WriteLine("        public " + EnumDescription.GetDescription(c.TipoVariavel) + "? " + c.Descricao + " { get; set; }");
                         else
                         {
-                            if (chkValidacoesColuna.Checked && c.AceitaNulo && string.IsNullOrEmpty(c.Default) && !TipoVariavelEnum.String.Equals(c.TipoVariavel))
+                            if (chkValidacoesColuna.Checked && c.AceitaNulo && string.IsNullOrEmpty(c.Default) && !TipoVariavelEnum.String.Equals(c.TipoVariavel) && !TipoVariavelEnum.Imagem.Equals(c.TipoVariavel))
                                 arquivo.WriteLine("        public " + EnumDescription.GetDescription(c.TipoVariavel) + "? " + c.Descricao + " { get; set; }");
                             else
                                 arquivo.WriteLine("        public " + EnumDescription.GetDescription(c.TipoVariavel) + " " + c.Descricao + " { get; set; }");
@@ -876,6 +876,35 @@ namespace GeradorCamadaCSharp
                     arquivo.WriteLine("            }");
                     arquivo.WriteLine("        }");
                     arquivo.WriteLine("");
+                    arquivo.WriteLine("        public bool InserirComID(" + tabela.ClasseInfo + " _obj, " + dbTransaction + " _trans)");
+                    arquivo.WriteLine("        {");
+                    arquivo.WriteLine("            try");
+                    arquivo.WriteLine("            {");
+                    arquivo.WriteLine("                return " + tabela.ApelidoDao + ".InserirComID(_obj, _trans);");
+                    arquivo.WriteLine("            }");
+                    arquivo.WriteLine("            catch");
+                    arquivo.WriteLine("            {");
+                    arquivo.WriteLine("                throw;");
+                    arquivo.WriteLine("            }");
+                    arquivo.WriteLine("        }");
+                    arquivo.WriteLine("        public bool InserirComID(" + stringConexaoParams + tabela.ClasseInfo + " _obj)");
+                    arquivo.WriteLine("        {");
+                    arquivo.WriteLine("            try");
+                    arquivo.WriteLine("            {");
+                    arquivo.WriteLine("                MySqlTransaction trans = Global.Funcoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
+                    arquivo.WriteLine("                bool sucesso = InserirComID(_obj, trans);");
+                    arquivo.WriteLine("                if (sucesso)");
+                    arquivo.WriteLine("                    Global.Funcoes.CommitTransaction(trans);");
+                    arquivo.WriteLine("                else");
+                    arquivo.WriteLine("                    Global.Funcoes.RollbackTransaction(trans);");
+                    arquivo.WriteLine("                return sucesso;");
+                    arquivo.WriteLine("            }");
+                    arquivo.WriteLine("            catch");
+                    arquivo.WriteLine("            {");
+                    arquivo.WriteLine("                throw;");
+                    arquivo.WriteLine("            }");
+                    arquivo.WriteLine("        }");
+                    arquivo.WriteLine("");
                     arquivo.WriteLine("        public bool Excluir(long Id, " + dbTransaction + " _trans)");
                     arquivo.WriteLine("        {");
                     arquivo.WriteLine("            try");
@@ -893,6 +922,35 @@ namespace GeradorCamadaCSharp
                     arquivo.WriteLine("            {");
                     arquivo.WriteLine("                " + dbTransaction + " trans = Global.Funcoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
                     arquivo.WriteLine("                bool sucesso = Excluir(Id, trans);");
+                    arquivo.WriteLine("                if (sucesso)");
+                    arquivo.WriteLine("                    Global.Funcoes.CommitTransaction(trans);");
+                    arquivo.WriteLine("                else");
+                    arquivo.WriteLine("                    Global.Funcoes.RollbackTransaction(trans);");
+                    arquivo.WriteLine("                return sucesso;");
+                    arquivo.WriteLine("            }");
+                    arquivo.WriteLine("            catch");
+                    arquivo.WriteLine("            {");
+                    arquivo.WriteLine("                throw;");
+                    arquivo.WriteLine("            }");
+                    arquivo.WriteLine("        }");
+                    arquivo.WriteLine("");
+                    arquivo.WriteLine("        public bool ExcluirTodos(" + dbTransaction + " _trans)");
+                    arquivo.WriteLine("        {");
+                    arquivo.WriteLine("            try");
+                    arquivo.WriteLine("            {");
+                    arquivo.WriteLine("                return " + tabela.ApelidoDao + ".ExcluirTodos(_trans);");
+                    arquivo.WriteLine("            }");
+                    arquivo.WriteLine("            catch");
+                    arquivo.WriteLine("            {");
+                    arquivo.WriteLine("                throw;");
+                    arquivo.WriteLine("            }");
+                    arquivo.WriteLine("        }");
+                    arquivo.WriteLine("        public bool ExcluirTodos(" + stringConexaoParams + ")");
+                    arquivo.WriteLine("        {");
+                    arquivo.WriteLine("            try");
+                    arquivo.WriteLine("            {");
+                    arquivo.WriteLine("                MySqlTransaction trans = Global.Funcoes.BeginTransaction(" + stringConexao.Replace(", ", "") + ");");
+                    arquivo.WriteLine("                bool sucesso = ExcluirTodos(trans);");
                     arquivo.WriteLine("                if (sucesso)");
                     arquivo.WriteLine("                    Global.Funcoes.CommitTransaction(trans);");
                     arquivo.WriteLine("                else");
@@ -1183,8 +1241,10 @@ namespace GeradorCamadaCSharp
                     arquivo.WriteLine("");
                     arquivo.WriteLine("        const string cmdInserir = \"insert into " + tabela.Descricao + " (\" + colunas + \") values (\" + colunasParametros + \");\";");
                     arquivo.WriteLine("        const string cmdAlterar = \"update " + tabela.Descricao + " set \" + colunasUpdate + \" where " + chavePrimariaDB + "=?" + chavePrimariaDB + "\";");
+                    arquivo.WriteLine("        const string cmdInserirComID = \"insert into " + tabela.Descricao + " (" + chavePrimariaDB + ",\" + colunas + \") values (?" + chavePrimariaDB + ",\" + colunasParametros + \");\";");
                     arquivo.WriteLine("");
                     arquivo.WriteLine("        const string cmdExcluiPorId = \"delete from " + tabela.Descricao + " where " + chavePrimariaDB + "=?" + chavePrimariaDB + "\";");
+                    arquivo.WriteLine("        const string cmdExcluiTodos = \"delete from " + tabela.Descricao + "; alter table " + tabela.Descricao + " auto_increment = 1\";");
                     arquivo.WriteLine("        const string cmdRetornaPorId = \"select * from " + tabela.Descricao + " where " + chavePrimariaDB + "=?" + chavePrimariaDB + "\";");
 
                     List<ColunaInfo> joins = new List<ColunaInfo>();
@@ -1246,11 +1306,21 @@ namespace GeradorCamadaCSharp
                     arquivo.WriteLine("            return _obj." + chavePrimaria + " == 0 ? Inserir(_obj, _trans) : Atualizar(_obj, _trans);");
                     arquivo.WriteLine("        }");
                     arquivo.WriteLine("");
+                    arquivo.WriteLine("        public bool InserirComID(" + tabela.ClasseInfo + " _obj, " + dbTransaction + " _trans)");
+                    arquivo.WriteLine("        {");
+                    arquivo.WriteLine("            return Global.Funcoes.ExecuteNonQuery(_trans, CommandType.Text, cmdInserirComID, New" + tabela.Classe + "Parameters(_obj, true));");
+                    arquivo.WriteLine("        }");
+                    arquivo.WriteLine("");
                     arquivo.WriteLine("        public bool Excluir(long " + chavePrimaria + ", " + dbTransaction + " _trans)");
                     arquivo.WriteLine("        {");
                     arquivo.WriteLine("            " + dbParameter + "[] parms = new " + dbParameter + "[1];");
                     arquivo.WriteLine("            parms[0] = Global.Funcoes.CreateParameter(param" + chavePrimaria + ", " + dbType + ".Int64, " + chavePrimaria + ");");
                     arquivo.WriteLine("            return Global.Funcoes.ExecuteNonQuery(_trans, CommandType.Text, cmdExcluiPorId, parms);");
+                    arquivo.WriteLine("        }");
+                    arquivo.WriteLine("");
+                    arquivo.WriteLine("        public bool ExcluirTodos(" + dbTransaction + " _trans)");
+                    arquivo.WriteLine("        {");
+                    arquivo.WriteLine("            return Global.Funcoes.ExecuteNonQuery(_trans, CommandType.Text, cmdExcluiTodos, null);");
                     arquivo.WriteLine("        }");
                     arquivo.WriteLine("");
                     arquivo.WriteLine("        public " + tabela.ClasseInfo + " RetornaPorId(" + stringConexaoParams + "long " + chavePrimaria + ", bool lazyLoading = false)");
@@ -1468,7 +1538,7 @@ namespace GeradorCamadaCSharp
                         else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
                             arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToBoolean(rdr[\"" + c.DescricaoDB + "\"]);");
                         else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
-                            arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToImage(rdr, \"" + c.DescricaoDB + "\");");
+                            arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToImage(rdr[\"" + c.DescricaoDB + "\"]);");
                         else
                             arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToString(rdr[\"" + c.DescricaoDB + "\"]);");
                     }
@@ -1503,7 +1573,7 @@ namespace GeradorCamadaCSharp
                         else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
                             arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToBoolean(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                         else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
-                            arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToImage(rdr, \"" + tabela.Descricao + "_" + c.DescricaoDB + "\");");
+                            arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToImage(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                         else
                             arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToString(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                     }

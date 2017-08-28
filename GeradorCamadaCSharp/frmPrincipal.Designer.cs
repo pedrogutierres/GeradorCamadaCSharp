@@ -43,6 +43,10 @@
             this.ordenar = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.novaTabela = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtRemoveLetrasIniciais = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.txtTabelasIniciam = new System.Windows.Forms.TextBox();
             this.chkConsiderarRelacionamentosSetIdPorInfo = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -74,10 +78,6 @@
             this.label4 = new System.Windows.Forms.Label();
             this.cmbDatabase = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.label6 = new System.Windows.Forms.Label();
-            this.txtRemoveLetrasIniciais = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.txtTabelasIniciam = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tabAtualiza.SuspendLayout();
@@ -266,10 +266,42 @@
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 156);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(113, 13);
+            this.label6.TabIndex = 9;
+            this.label6.Text = "Remover letras inicias:";
+            // 
+            // txtRemoveLetrasIniciais
+            // 
+            this.txtRemoveLetrasIniciais.Location = new System.Drawing.Point(122, 153);
+            this.txtRemoveLetrasIniciais.Name = "txtRemoveLetrasIniciais";
+            this.txtRemoveLetrasIniciais.Size = new System.Drawing.Size(223, 20);
+            this.txtRemoveLetrasIniciais.TabIndex = 10;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(32, 123);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(86, 26);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "Apenas tabelas \r\nque iniciam com:";
+            // 
+            // txtTabelasIniciam
+            // 
+            this.txtTabelasIniciam.Location = new System.Drawing.Point(122, 127);
+            this.txtTabelasIniciam.Name = "txtTabelasIniciam";
+            this.txtTabelasIniciam.Size = new System.Drawing.Size(223, 20);
+            this.txtTabelasIniciam.TabIndex = 8;
+            // 
             // chkConsiderarRelacionamentosSetIdPorInfo
             // 
             this.chkConsiderarRelacionamentosSetIdPorInfo.AutoSize = true;
-            this.chkConsiderarRelacionamentosSetIdPorInfo.Location = new System.Drawing.Point(123, 227);
+            this.chkConsiderarRelacionamentosSetIdPorInfo.Location = new System.Drawing.Point(122, 229);
             this.chkConsiderarRelacionamentosSetIdPorInfo.Name = "chkConsiderarRelacionamentosSetIdPorInfo";
             this.chkConsiderarRelacionamentosSetIdPorInfo.Size = new System.Drawing.Size(232, 17);
             this.chkConsiderarRelacionamentosSetIdPorInfo.TabIndex = 13;
@@ -279,7 +311,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(67, 356);
+            this.label5.Location = new System.Drawing.Point(67, 380);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(48, 13);
             this.label5.TabIndex = 18;
@@ -289,7 +321,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(66, 330);
+            this.label3.Location = new System.Drawing.Point(66, 354);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(50, 13);
             this.label3.TabIndex = 16;
@@ -298,7 +330,7 @@
             // 
             // txtFiltroList
             // 
-            this.txtFiltroList.Location = new System.Drawing.Point(123, 353);
+            this.txtFiltroList.Location = new System.Drawing.Point(123, 377);
             this.txtFiltroList.Name = "txtFiltroList";
             this.txtFiltroList.Size = new System.Drawing.Size(222, 20);
             this.txtFiltroList.TabIndex = 19;
@@ -306,7 +338,7 @@
             // 
             // txtFiltroInfo
             // 
-            this.txtFiltroInfo.Location = new System.Drawing.Point(123, 327);
+            this.txtFiltroInfo.Location = new System.Drawing.Point(123, 351);
             this.txtFiltroInfo.Name = "txtFiltroInfo";
             this.txtFiltroInfo.Size = new System.Drawing.Size(222, 20);
             this.txtFiltroInfo.TabIndex = 17;
@@ -328,7 +360,7 @@
             // 
             this.groupBox7.Controls.Add(this.rdbMySQL);
             this.groupBox7.Controls.Add(this.rdbADO_Net);
-            this.groupBox7.Location = new System.Drawing.Point(246, 255);
+            this.groupBox7.Location = new System.Drawing.Point(246, 279);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(117, 66);
             this.groupBox7.TabIndex = 15;
@@ -361,7 +393,7 @@
             // 
             this.groupBox6.Controls.Add(this.rdbFuncoesWebService);
             this.groupBox6.Controls.Add(this.rdbFuncoesForm);
-            this.groupBox6.Location = new System.Drawing.Point(123, 255);
+            this.groupBox6.Location = new System.Drawing.Point(123, 279);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(117, 66);
             this.groupBox6.TabIndex = 14;
@@ -394,9 +426,9 @@
             // 
             this.groupBox5.Controls.Add(this.rdbREST);
             this.groupBox5.Controls.Add(this.rdbSOAP);
-            this.groupBox5.Location = new System.Drawing.Point(122, 459);
+            this.groupBox5.Location = new System.Drawing.Point(122, 472);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(118, 60);
+            this.groupBox5.Size = new System.Drawing.Size(179, 47);
             this.groupBox5.TabIndex = 24;
             this.groupBox5.TabStop = false;
             // 
@@ -404,7 +436,7 @@
             // 
             this.rdbREST.AutoSize = true;
             this.rdbREST.Checked = true;
-            this.rdbREST.Location = new System.Drawing.Point(33, 13);
+            this.rdbREST.Location = new System.Drawing.Point(11, 19);
             this.rdbREST.Name = "rdbREST";
             this.rdbREST.Size = new System.Drawing.Size(54, 17);
             this.rdbREST.TabIndex = 0;
@@ -416,7 +448,7 @@
             // rdbSOAP
             // 
             this.rdbSOAP.AutoSize = true;
-            this.rdbSOAP.Location = new System.Drawing.Point(33, 36);
+            this.rdbSOAP.Location = new System.Drawing.Point(108, 19);
             this.rdbSOAP.Name = "rdbSOAP";
             this.rdbSOAP.Size = new System.Drawing.Size(54, 17);
             this.rdbSOAP.TabIndex = 1;
@@ -463,7 +495,7 @@
             // chkComunicadorSemNewInstance
             // 
             this.chkComunicadorSemNewInstance.AutoSize = true;
-            this.chkComunicadorSemNewInstance.Location = new System.Drawing.Point(122, 439);
+            this.chkComunicadorSemNewInstance.Location = new System.Drawing.Point(122, 451);
             this.chkComunicadorSemNewInstance.Name = "chkComunicadorSemNewInstance";
             this.chkComunicadorSemNewInstance.Size = new System.Drawing.Size(174, 17);
             this.chkComunicadorSemNewInstance.TabIndex = 23;
@@ -474,7 +506,7 @@
             // lblPacoteWebService
             // 
             this.lblPacoteWebService.AutoSize = true;
-            this.lblPacoteWebService.Location = new System.Drawing.Point(50, 407);
+            this.lblPacoteWebService.Location = new System.Drawing.Point(50, 419);
             this.lblPacoteWebService.Name = "lblPacoteWebService";
             this.lblPacoteWebService.Size = new System.Drawing.Size(66, 26);
             this.lblPacoteWebService.TabIndex = 20;
@@ -483,7 +515,7 @@
             // 
             // txtPacoteWebService
             // 
-            this.txtPacoteWebService.Location = new System.Drawing.Point(122, 413);
+            this.txtPacoteWebService.Location = new System.Drawing.Point(122, 425);
             this.txtPacoteWebService.Name = "txtPacoteWebService";
             this.txtPacoteWebService.Size = new System.Drawing.Size(222, 20);
             this.txtPacoteWebService.TabIndex = 22;
@@ -492,7 +524,7 @@
             // chkWebService
             // 
             this.chkWebService.AutoSize = true;
-            this.chkWebService.Location = new System.Drawing.Point(122, 390);
+            this.chkWebService.Location = new System.Drawing.Point(122, 402);
             this.chkWebService.Name = "chkWebService";
             this.chkWebService.Size = new System.Drawing.Size(117, 17);
             this.chkWebService.TabIndex = 21;
@@ -579,38 +611,6 @@
             this.cmbDatabase.Name = "cmbDatabase";
             this.cmbDatabase.Size = new System.Drawing.Size(223, 21);
             this.cmbDatabase.TabIndex = 0;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 156);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(113, 13);
-            this.label6.TabIndex = 9;
-            this.label6.Text = "Remover letras inicias:";
-            // 
-            // txtRemoveLetrasIniciais
-            // 
-            this.txtRemoveLetrasIniciais.Location = new System.Drawing.Point(122, 153);
-            this.txtRemoveLetrasIniciais.Name = "txtRemoveLetrasIniciais";
-            this.txtRemoveLetrasIniciais.Size = new System.Drawing.Size(223, 20);
-            this.txtRemoveLetrasIniciais.TabIndex = 10;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(32, 123);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(86, 26);
-            this.label7.TabIndex = 7;
-            this.label7.Text = "Apenas tabelas \r\nque iniciam com:";
-            // 
-            // txtTabelasIniciam
-            // 
-            this.txtTabelasIniciam.Location = new System.Drawing.Point(122, 127);
-            this.txtTabelasIniciam.Name = "txtTabelasIniciam";
-            this.txtTabelasIniciam.Size = new System.Drawing.Size(223, 20);
-            this.txtTabelasIniciam.TabIndex = 8;
             // 
             // frmPrincipal
             // 
