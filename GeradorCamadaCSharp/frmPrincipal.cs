@@ -1536,7 +1536,7 @@ namespace GeradorCamadaCSharp
                         else if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
                             arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.GetDateTimeOrNull(rdr[\"" + c.DescricaoDB + "\"]);");
                         else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
-                            arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToBoolean(rdr[\"" + c.DescricaoDB + "\"]);");
+                            arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToBoolean(Global.Funcoes.ConvertToInt32(rdr[\"" + c.DescricaoDB + "\"]));");
                         else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
                             arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToImage(rdr[\"" + c.DescricaoDB + "\"]);");
                         else
@@ -1571,7 +1571,7 @@ namespace GeradorCamadaCSharp
                         else if (c.TipoVariavel.Equals(TipoVariavelEnum.DateTime))
                             arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.GetDateTimeOrNull(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                         else if (c.TipoVariavel.Equals(TipoVariavelEnum.Bool))
-                            arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToBoolean(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
+                            arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToBoolean(Global.Funcoes.ConvertToInt32(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]));");
                         else if (c.TipoVariavel.Equals(TipoVariavelEnum.Imagem))
                             arquivo.WriteLine("            " + tabela.ApelidoInfo + "." + c.Descricao + " = Global.Funcoes.ConvertToImage(rdr[\"" + tabela.Descricao + "_" + c.DescricaoDB + "\"]);");
                         else
