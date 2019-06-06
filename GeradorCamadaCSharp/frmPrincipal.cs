@@ -8,6 +8,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
@@ -608,6 +609,8 @@ namespace GeradorCamadaCSharp
                     arquivo.WriteLine("using " + pacoteORM + ".BaseObjects;");
                     arquivo.WriteLine("using " + pacoteORM + ".Library.DAL;");
                     arquivo.WriteLine("using " + pacoteORM + ".Util;");
+                    if (tabela.colunas.Any(c => c.TipoVariavel.Equals(TipoVariavelEnum.Imagem)))
+                       arquivo.WriteLine("using System.Drawing;");
                     arquivo.WriteLine("");
                     arquivo.WriteLine("namespace " + pacoteORM + ".Library.Model");
                     arquivo.WriteLine("{");
@@ -2994,7 +2997,7 @@ namespace GeradorCamadaCSharp
 
             if (!c.ChavePrimaria)
             {
-                if  (!string.IsNullOrEmpty(c.Comentario) && c.Comentario.ToUpper().Contains("FILTROINFO"))
+                if (!string.IsNullOrEmpty(c.Comentario) && c.Comentario.ToUpper().Contains("FILTROINFO"))
                 { }
                 else if (!string.IsNullOrEmpty(c.Comentario) && c.Comentario.ToUpper().Contains("FILTROLISTJOIN"))
                 {
